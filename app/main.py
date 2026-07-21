@@ -15,6 +15,7 @@ from strategy.strategy_engine import StrategyEngine
 from ai.ai_engine import AIEngine
 from journal.trade_journal import TradeJournal
 from datafeed.market_data import MarketData
+from brokers.paper_broker import PaperBroker
 
 
 def main():
@@ -33,6 +34,10 @@ def main():
     ai = AIEngine()
     journal = TradeJournal()
     data = MarketData()
+    broker = PaperBroker()
+
+    # Connect broker
+    broker.connect()
 
     # Load watchlist
     market.load_default_watchlist()

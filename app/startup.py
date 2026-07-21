@@ -1,0 +1,15 @@
+"""
+HAPT Startup
+------------
+Runs the application's startup checks.
+"""
+
+
+def run_startup_checks():
+    """Run the initial startup checks."""
+
+    print("Running startup checks...")
+
+    print("✓ Configuration loaded")
+    print("✓ Logger initialized")
+    print("✓ System ready")

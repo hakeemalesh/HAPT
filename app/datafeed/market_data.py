@@ -2,60 +2,141 @@
 HAPT Market Data
 ----------------
 
-Provides market data to HAPT.
+Central access point for market data.
 
-This module is responsible for:
-- Returning market prices
-- Identifying the data provider
-- Preparing for future live data connections
+This module coordinates:
+- Data Provider
+- Historical Data
+- Demo Historical Data
+
+Other HAPT modules should interact with this class rather
+than individual data sources.
 """
 
 
+from datafeed.demo_historical_data import DemoHistoricalData
+from datafeed.data_provider import DataProvider
+from datafeed.historical_data import HistoricalData
+
+
 class MarketData:
-    """Supplies market prices and market information."""
+    """Provides access to market data."""
 
-    def __init__(self):
-        """Initialize the market data provider."""
+    def __init__(self, provider="demo"):
+        """Initialize the market data system."""
 
-        self.provider = "Demo Data"
+        self.provider = DataProvider(provider)
 
-        self.demo_prices = {
-            "MES": 6250.25,
-            "MNQ": 23250.50,
-            "M2K": 2250.75,
-            "MYM": 45125.00,
-            "ES": 6252.50,
-            "NQ": 23260.25,
-            "RTY": 2254.00,
-            "YM": 45140.00,
-            "CL": 68.45,
-            "GC": 3445.60,
-        }
+        self.history = HistoricalData()
 
-    def get_price(self, symbol):
-        """
-        Return the latest available price for a symbol.
-        """
+        self.demo_history = DemoHistoricalData()
 
-        return self.demo_prices.get(symbol, 0.0)
+        self.load_demo_history()
+
+
+    # --------------------------------------------------
+    # Provider Information
+    # --------------------------------------------------
 
     def get_provider(self):
-        """
-        Return the current market data provider.
-        """
+        """Return the active provider."""
 
-        return self.provider
+        return self.provider.get_provider_name()
+
+
+    # --------------------------------------------------
+    # Live / Current Price
+    # --------------------------------------------------
+
+    def get_price(self, symbol):
+        """Return the latest price."""
+
+        return self.provider.get_price(symbol)
+
 
     def symbol_exists(self, symbol):
-        """
-        Check whether a symbol exists.
-        """
+        """Return True if the symbol exists."""
 
-        return symbol in self.demo_prices
+        return self.provider.symbol_exists(symbol)
+
 
     def get_all_prices(self):
+        """Return all available prices."""
+
+        return self.provider.get_all_prices()
+
+
+    # --------------------------------------------------
+    # Historical Data
+    # --------------------------------------------------
+
+    def add_historical_data(self, symbol, timeframe, candles):
+        """Store historical candle data."""
+
+        self.history.add_candles(
+            symbol,
+            timeframe,
+            candles
+        )
+
+
+    def get_historical_data(self, symbol, timeframe="5m"):
+        """Return historical candle data."""
+
+        return self.history.get_candles(
+            symbol,
+            timeframe
+        )
+
+
+    def has_historical_data(self, symbol, timeframe="5m"):
+        """Return True if historical data exists."""
+
+        return self.history.has_data(
+            symbol,
+            timeframe
+        )
+
+
+    # --------------------------------------------------
+    # Demo Historical Data
+    # --------------------------------------------------
+
+    def load_demo_history(self):
         """
-        Return every available demo price.
+        Load demo historical candles.
         """
 
-        return self.demo_prices.copy()
+        symbols = [
+            "MES",
+            "MNQ",
+            "M2K",
+            "MYM",
+            "ES",
+            "NQ",
+            "RTY",
+            "YM",
+            "CL",
+            "GC"
+        ]
+
+
+        for symbol in symbols:
+
+            candles = self.demo_history.generate(symbol)
+
+            self.add_historical_data(
+                symbol,
+                "5m",
+                candles
+            )
+
+
+    # --------------------------------------------------
+    # Maintenance
+    # --------------------------------------------------
+
+    def clear_history(self):
+        """Clear all historical data."""
+
+        self.history.clear()

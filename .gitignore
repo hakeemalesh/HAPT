@@ -36,3 +36,11 @@ dist/
 
 # Zip Archives
 *.zip
+
+# HAPT Cache
+data/historical/*.csv
+data/live/*.csv
+
+# Keep the cache directories
+!data/historical/.gitkeep
+!data/live/.gitkeep

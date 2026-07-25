@@ -5,6 +5,8 @@ HAPT Average True Range (ATR)
 Calculates market volatility using Average True Range.
 """
 
+from collections.abc import Sequence
+
 
 class ATR:
     """Calculates Average True Range."""
@@ -16,11 +18,11 @@ class ATR:
 
         Parameters
         ----------
-        highs : list
+        highs : list or pandas.Series
             High prices.
-        lows : list
+        lows : list or pandas.Series
             Low prices.
-        closes : list
+        closes : list or pandas.Series
             Closing prices.
         period : int
             ATR period.
@@ -31,14 +33,33 @@ class ATR:
             Latest ATR value.
         """
 
-        if not highs or not lows or not closes:
+        if highs is None or lows is None or closes is None:
+            return None
+
+        if not isinstance(highs, Sequence):
+            highs = list(highs)
+
+        if not isinstance(lows, Sequence):
+            lows = list(lows)
+
+        if not isinstance(closes, Sequence):
+            closes = list(closes)
+
+        if not (
+            len(highs)
+            == len(lows)
+            == len(closes)
+        ):
+            return None
+
+        if len(highs) == 0:
+            return None
+
+        if period <= 0:
             return None
 
         if len(highs) == 1:
             return round(highs[0] - lows[0], 2)
-
-        if len(highs) <= period:
-            period = len(highs) - 1
 
         true_ranges = []
 
@@ -51,9 +72,11 @@ class ATR:
 
             true_ranges.append(tr)
 
-        if period <= 0:
+        if not true_ranges:
             return None
 
-        atr = sum(true_ranges[:period]) / period
+        period = min(period, len(true_ranges))
+
+        atr = sum(true_ranges[-period:]) / period
 
         return round(atr, 2)

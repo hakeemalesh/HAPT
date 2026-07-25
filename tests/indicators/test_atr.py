@@ -7,7 +7,7 @@ Unit tests for ATR calculations.
 
 import unittest
 
-from indicators.atr import ATR
+from app.indicators.atr import ATR
 
 
 class TestATR(unittest.TestCase):

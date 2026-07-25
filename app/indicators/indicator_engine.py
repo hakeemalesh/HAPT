@@ -5,16 +5,16 @@ HAPT Indicator Engine
 Coordinates all technical indicator calculations.
 """
 
-from indicators.ema import EMA
-from indicators.rsi import RSI
-from indicators.macd import MACD
-from indicators.atr import ATR
-from indicators.vwap import VWAP
-from indicators.volume import Volume
+from app.indicators.ema import EMA
+from app.indicators.rsi import RSI
+from app.indicators.macd import MACD
+from app.indicators.atr import ATR
+from app.indicators.vwap import VWAP
+from app.indicators.volume import Volume
 
 
 class IndicatorEngine:
-    """Coordinates all indicator calculations."""
+    """Coordinates all technical indicator calculations."""
 
     @staticmethod
     def calculate(
@@ -46,7 +46,6 @@ class IndicatorEngine:
         current_volume = volumes[-1] if volumes else 0
 
         return {
-
             "ema": EMA.calculate_all(closes),
 
             "rsi": RSI.calculate(closes),
@@ -67,10 +66,7 @@ class IndicatorEngine:
             ),
 
             "volume": {
-
-                "average": Volume.average(
-                    volumes
-                ),
+                "average": Volume.average(volumes),
 
                 "relative": Volume.relative(
                     current_volume,
@@ -80,6 +76,6 @@ class IndicatorEngine:
                 "high_volume": Volume.is_high_volume(
                     current_volume,
                     volumes
-                )
-            }
+                ),
+            },
         }

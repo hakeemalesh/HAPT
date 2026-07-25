@@ -21,6 +21,18 @@ class DataStorage:
         """
         directory.mkdir(parents=True, exist_ok=True)
 
+    def historical_path(self, symbol: str) -> Path:
+        """
+        Return the cache file path for historical data.
+        """
+        return self.base_path / "historical" / f"{symbol}.csv"
+
+    def cache_exists(self, symbol: str) -> bool:
+        """
+        Return True if cached historical data exists.
+        """
+        return self.historical_path(symbol).exists()
+
     def save_csv(self, data: pd.DataFrame, filepath: Path):
         """
         Save a DataFrame as a CSV file.

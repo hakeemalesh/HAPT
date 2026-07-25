@@ -5,9 +5,8 @@ Provides a unified interface for retrieving market data
 through interchangeable providers.
 """
 
-from pathlib import Path
-
 from data.providers.base_provider import BaseProvider
+from data.storage import DataStorage
 
 
 class MarketData:
@@ -17,17 +16,26 @@ class MarketData:
 
     def __init__(self, provider: BaseProvider):
         self.provider = provider
-
-        self.base_path = Path("data")
-        self.historical_path = self.base_path / "historical"
-        self.live_path = self.base_path / "live"
-        self.logs_path = self.base_path / "logs"
+        self.storage = DataStorage()
 
     def get_historical_data(self, symbol: str, **kwargs):
         """
-        Retrieve historical market data from the configured provider.
+        Retrieve historical market data.
+
+        If cached data exists, load it from disk.
+        Otherwise, download it, save it to the cache,
+        and return the downloaded data.
         """
-        return self.provider.get_historical_data(symbol, **kwargs)
+        filepath = self.storage.historical_path(symbol)
+
+        if self.storage.cache_exists(symbol):
+            return self.storage.load_csv(filepath)
+
+        data = self.provider.get_historical_data(symbol, **kwargs)
+
+        self.storage.save_csv(data, filepath)
+
+        return data
 
     def get_live_data(self, symbol: str, **kwargs):
         """

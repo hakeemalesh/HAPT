@@ -5,7 +5,7 @@ HAPT MACD
 Calculates the Moving Average Convergence Divergence.
 """
 
-from indicators.ema import EMA
+from app.indicators.ema import EMA
 
 
 class MACD:

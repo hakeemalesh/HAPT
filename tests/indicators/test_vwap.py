@@ -7,7 +7,7 @@ Unit tests for VWAP calculations.
 
 import unittest
 
-from indicators.vwap import VWAP
+from app.indicators.vwap import VWAP
 
 
 class TestVWAP(unittest.TestCase):
@@ -28,7 +28,6 @@ class TestVWAP(unittest.TestCase):
         closes = [100]
         volumes = [1000]
 
-        # Typical Price = (105 + 95 + 100) / 3 = 100
         self.assertEqual(
             VWAP.calculate(
                 highs,
@@ -40,7 +39,7 @@ class TestVWAP(unittest.TestCase):
         )
 
     def test_multiple_candles(self):
-        """VWAP for multiple candles."""
+        """VWAP should return a float."""
 
         highs = [105, 110]
         lows = [95, 100]
@@ -56,6 +55,52 @@ class TestVWAP(unittest.TestCase):
 
         self.assertIsNotNone(result)
         self.assertIsInstance(result, float)
+
+    def test_mismatched_lengths(self):
+        """Mismatched inputs should return None."""
+
+        self.assertIsNone(
+            VWAP.calculate(
+                [100],
+                [90],
+                [95],
+                []
+            )
+        )
+
+    def test_zero_volume(self):
+        """Zero total volume should return None."""
+
+        self.assertIsNone(
+            VWAP.calculate(
+                [100],
+                [90],
+                [95],
+                [0]
+            )
+        )
+
+    def test_known_vwap(self):
+        """Known VWAP calculation."""
+
+        highs = [110, 120]
+        lows = [90, 100]
+        closes = [100, 110]
+        volumes = [1000, 1000]
+
+        # Candle 1 TP = 100
+        # Candle 2 TP = 110
+        # VWAP = (100000 + 110000) / 2000 = 105
+
+        self.assertEqual(
+            VWAP.calculate(
+                highs,
+                lows,
+                closes,
+                volumes
+            ),
+            105.0
+        )
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 Storage utilities for HAPT market data.
 """
 
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -32,6 +33,38 @@ class DataStorage:
         Return True if cached historical data exists.
         """
         return self.historical_path(symbol).exists()
+
+    def cache_age(self, symbol: str) -> timedelta | None:
+        """
+        Return the age of the cached file.
+
+        Returns None if the cache file does not exist.
+        """
+        filepath = self.historical_path(symbol)
+
+        if not filepath.exists():
+            return None
+
+        modified = datetime.fromtimestamp(filepath.stat().st_mtime)
+
+        return datetime.now() - modified
+
+    def is_cache_stale(
+        self,
+        symbol: str,
+        max_age: timedelta = timedelta(days=1),
+    ) -> bool:
+        """
+        Return True if the cache is stale.
+
+        Missing cache files are considered stale.
+        """
+        age = self.cache_age(symbol)
+
+        if age is None:
+            return True
+
+        return age > max_age
 
     def save_csv(self, data: pd.DataFrame, filepath: Path):
         """

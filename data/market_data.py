@@ -5,6 +5,8 @@ Provides a unified interface for retrieving market data
 through interchangeable providers.
 """
 
+from datetime import timedelta
+
 from data.providers.base_provider import BaseProvider
 from data.storage import DataStorage
 
@@ -22,13 +24,19 @@ class MarketData:
         """
         Retrieve historical market data.
 
-        If cached data exists, load it from disk.
-        Otherwise, download it, save it to the cache,
+        If a fresh cache exists, load it from disk.
+        Otherwise, download new data, update the cache,
         and return the downloaded data.
         """
         filepath = self.storage.historical_path(symbol)
 
-        if self.storage.cache_exists(symbol):
+        if (
+            self.storage.cache_exists(symbol)
+            and not self.storage.is_cache_stale(
+                symbol,
+                max_age=timedelta(days=1),
+            )
+        ):
             return self.storage.load_csv(filepath)
 
         data = self.provider.get_historical_data(symbol, **kwargs)

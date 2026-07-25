@@ -7,7 +7,7 @@ Unit tests for EMA calculations.
 
 import unittest
 
-from indicators.ema import EMA
+from app.indicators.ema import EMA
 
 
 class TestEMA(unittest.TestCase):
@@ -26,6 +26,17 @@ class TestEMA(unittest.TestCase):
         self.assertEqual(
             EMA.calculate([100], 9),
             100
+        )
+
+    def test_shorter_than_period(self):
+        """Short data should return the average."""
+
+        self.assertEqual(
+            EMA.calculate(
+                [100, 101, 102],
+                9
+            ),
+            101.0
         )
 
     def test_multiple_prices(self):
@@ -68,6 +79,15 @@ class TestEMA(unittest.TestCase):
             result["ema_9"],
             float
         )
+
+    def test_invalid_period(self):
+        """Period must be greater than zero."""
+
+        with self.assertRaises(ValueError):
+            EMA.calculate(
+                [100, 101],
+                0
+            )
 
 
 if __name__ == "__main__":

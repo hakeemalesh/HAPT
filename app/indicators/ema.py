@@ -5,6 +5,8 @@ HAPT Exponential Moving Average (EMA)
 Calculates Exponential Moving Averages.
 """
 
+from collections.abc import Sequence
+
 
 class EMA:
     """Calculates Exponential Moving Averages."""
@@ -16,8 +18,8 @@ class EMA:
 
         Parameters
         ----------
-        prices : list
-            List of closing prices.
+        prices : list or pandas.Series
+            Closing prices.
         period : int
             EMA period.
 
@@ -27,11 +29,21 @@ class EMA:
             Latest EMA value.
         """
 
-        if not prices:
+        if period <= 0:
+            raise ValueError("period must be greater than 0")
+
+        if prices is None:
+            return None
+
+        # Accept lists, tuples and pandas Series
+        if not isinstance(prices, Sequence):
+            prices = list(prices)
+
+        if len(prices) == 0:
             return None
 
         if len(prices) == 1:
-            return prices[0]
+            return float(prices[0])
 
         if len(prices) < period:
             return round(sum(prices) / len(prices), 2)
@@ -43,7 +55,7 @@ class EMA:
         for price in prices[period:]:
             ema = ((price - ema) * multiplier) + ema
 
-        return round(ema, 2)
+        return round(float(ema), 2)
 
     @staticmethod
     def calculate_all(prices):

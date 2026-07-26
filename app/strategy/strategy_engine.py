@@ -2,314 +2,180 @@
 HAPT Strategy Engine
 --------------------
 
-Evaluates market data and produces trading decisions.
+Coordinates the HAPT trading workflow.
+
+Workflow
+--------
+Market Context
+      │
+      ▼
+Decision Engine
+      │
+      ▼
+Risk Manager
+      │
+      ▼
+Trade Model
 """
 
-
-from risk.risk_manager import RiskManager
-from instruments.instrument_manager import InstrumentManager
-from calculator.contract_calculator import ContractCalculator
-
+from app.calculator.contract_calculator import ContractCalculator
+from app.decision.decision_engine import DecisionEngine
+from app.instruments.instrument_manager import InstrumentManager
+from app.models.trade import Trade
+from app.risk.risk_manager import RiskManager
 
 
 class StrategyEngine:
-    """Evaluates trading opportunities."""
+    """Coordinates the complete HAPT trading workflow."""
 
+    DEFAULT_RISK_REWARD = 2.0
+    DEFAULT_STOP_DISTANCE = 1.0
 
     def __init__(self):
-        """Initialize the strategy engine."""
+        """Initialize engine dependencies."""
 
-        self.strategy_name = "HAPT Professional Strategy"
-
-        self.default_rr = "1 : 2"
-
+        self.decision_engine = DecisionEngine()
         self.risk_manager = RiskManager()
-
         self.instrument_manager = InstrumentManager()
-
         self.contract_calculator = ContractCalculator()
 
-
-
-    def analyze(self, symbol, price, market_context):
+    def analyze(
+        self,
+        context: dict,
+        entry_price: float,
+    ) -> Trade:
         """
-        Analyze a trading symbol.
+        Analyze a trading opportunity.
 
         Parameters
         ----------
-        symbol : str
-            Trading symbol.
+        context : dict
+            Market context.
 
-        price : float
+        entry_price : float
             Current market price.
-
-        market_context : dict
-            Current market intelligence.
 
         Returns
         -------
-        dict
-            Trading decision.
+        Trade
+            Completed trade plan.
         """
 
+        decision = self.decision_engine.evaluate(context)
 
-        print(f"Analyzing {symbol}...")
+        trade = Trade()
 
-        print("Using market intelligence context...")
+        trade.symbol = decision.symbol
+        trade.market = decision.market
+        trade.signal = decision.signal
+        trade.grade = decision.grade
 
+        #
+        # No trade if decision is WAIT
+        #
+        if decision.signal == "WAIT":
 
-        context = market_context
+            trade.approved = False
+            trade.status = "REJECTED"
+            trade.notes = decision.reasons
 
+            return trade
 
-
-        risk = self.risk_manager.get_max_risk()
-
-
-
-        trend = self._determine_trend(context)
-
-        signal = self._determine_signal(context)
-
-        confidence = self._calculate_confidence(context)
-
-
-
-        entry_price = price
-
-
-        stop_distance = 1.0
-
-
-        stop_loss = entry_price - stop_distance
-
-
-
-        specs = self.instrument_manager.get_specs(symbol)
-
+        #
+        # Instrument specifications
+        #
+        specs = self.instrument_manager.get_specs(
+            decision.symbol
+        )
 
         if specs:
+            dollar_per_point = specs.get(
+                "dollar_per_point",
+                5.0,
+            )
+        else:
+            dollar_per_point = 5.0
 
-            dollar_per_point = specs["dollar_per_point"]
+        #
+        # Trade prices
+        #
+        stop_distance = self.DEFAULT_STOP_DISTANCE
+
+        if decision.signal == "BUY":
+
+            stop_loss = (
+                entry_price
+                - stop_distance
+            )
+
+            target_price = (
+                self.contract_calculator.calculate_take_profit(
+                    entry_price,
+                    stop_distance,
+                    self.DEFAULT_RISK_REWARD,
+                )
+            )
 
         else:
 
-            dollar_per_point = 5.0
+            stop_loss = (
+                entry_price
+                + stop_distance
+            )
 
+            target_price = (
+                entry_price
+                - (
+                    stop_distance
+                    * self.DEFAULT_RISK_REWARD
+                )
+            )
 
-
-        position_size = self.contract_calculator.calculate_position_size(
-            risk,
-            stop_distance,
-            dollar_per_point
+        #
+        # Risk Evaluation
+        #
+        risk = self.risk_manager.evaluate(
+            decision=decision,
+            entry_price=entry_price,
+            stop_loss=stop_loss,
+            target_price=target_price,
+            dollar_per_point=dollar_per_point,
         )
 
+        #
+        # Populate Trade model
+        #
+        trade.entry_price = risk.entry_price
+        trade.stop_loss = risk.stop_loss
+        trade.target_price = risk.target_price
 
-
-        take_profit = self.contract_calculator.calculate_take_profit(
-            entry_price,
-            stop_distance,
-            2
+        trade.position_size = (
+            risk.position_size
         )
 
-
-
-        return {
-
-            "symbol": symbol,
-
-            "trend": trend,
-
-            "ema_alignment": self._ema_alignment(context),
-
-            "vwap": self._vwap_position(context),
-
-            "volume": self._volume_strength(context),
-
-            "momentum": self._momentum(context),
-
-            "signal": signal,
-
-            "confidence": confidence,
-
-            "entry_price": entry_price,
-
-            "stop_loss": stop_loss,
-
-            "take_profit": take_profit,
-
-            "risk": risk,
-
-            "position_size": position_size,
-
-            "risk_reward": self.default_rr,
-
-            "market_context": context
-        }
-
-
-
-
-    # --------------------------------------------------
-    # Decision Helpers
-    # --------------------------------------------------
-
-
-    def _determine_trend(self, context):
-        """Determine overall trend using EMA alignment."""
-
-
-        ema9 = context.get("ema_9")
-
-        ema20 = context.get("ema_20")
-
-        ema50 = context.get("ema_50")
-
-        ema200 = context.get("ema_200")
-
-
-
-        if None in (ema9, ema20, ema50, ema200):
-
-            return "Unknown"
-
-
-
-        if ema9 > ema20 > ema50 > ema200:
-
-            return "Bullish"
-
-
-
-        if ema9 < ema20 < ema50 < ema200:
-
-            return "Bearish"
-
-
-
-        return "Sideways"
-
-
-
-
-    def _ema_alignment(self, context):
-        """Return EMA alignment."""
-
-        return self._determine_trend(context)
-
-
-
-
-    def _vwap_position(self, context):
-        """Return VWAP status."""
-
-
-        if context.get("vwap") is not None:
-
-            return "Available"
-
-
-        return "Unknown"
-
-
-
-
-    def _volume_strength(self, context):
-        """Return volume strength."""
-
-
-        if context.get("high_volume"):
-
-            return "High"
-
-
-        return "Normal"
-
-
-
-
-    def _momentum(self, context):
-        """Estimate momentum using RSI."""
-
-
-        rsi = context.get("rsi")
-
-
-
-        if rsi is None:
-
-            return "Unknown"
-
-
-
-        if rsi >= 60:
-
-            return "Bullish"
-
-
-
-        if rsi <= 40:
-
-            return "Bearish"
-
-
-
-        return "Neutral"
-
-
-
-
-    def _determine_signal(self, context):
-        """Determine BUY / SELL / WAIT."""
-
-
-        trend = self._determine_trend(context)
-
-
-        momentum = self._momentum(context)
-
-
-
-        if trend == "Bullish" and momentum == "Bullish":
-
-            return "BUY"
-
-
-
-        if trend == "Bearish" and momentum == "Bearish":
-
-            return "SELL"
-
-
-
-        return "WAIT"
-
-
-
-
-    def _calculate_confidence(self, context):
-        """Calculate confidence score."""
-
-
-        score = 50
-
-
-
-        if self._determine_trend(context) != "Sideways":
-
-            score += 20
-
-
-
-        if self._momentum(context) != "Neutral":
-
-            score += 15
-
-
-
-        if context.get("high_volume"):
-
-            score += 15
-
-
-
-        return min(score, 100)
+        trade.risk_amount = (
+            risk.risk_amount
+        )
+
+        trade.risk_reward = (
+            risk.risk_reward
+        )
+
+        trade.approved = (
+            risk.approved
+        )
+
+        trade.notes.extend(
+            decision.reasons
+        )
+
+        trade.notes.extend(
+            risk.notes
+        )
+
+        if risk.approved:
+            trade.status = "APPROVED"
+        else:
+            trade.status = "REJECTED"
+
+        return trade

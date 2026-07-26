@@ -3,14 +3,19 @@ HAPT Trade Model
 ----------------
 
 Represents the final trade plan produced
-by the Strategy Engine.
+by the Trade Planner.
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime
 
 
 @dataclass
 class Trade:
+    """
+    Represents a complete trade plan ready for
+    journaling or execution.
+    """
 
     symbol: str = ""
 
@@ -33,5 +38,9 @@ class Trade:
     risk_reward: float = 0.0
 
     approved: bool = False
+
+    status: str = "PENDING"
+
+    created_at: datetime = field(default_factory=datetime.now)
 
     notes: list[str] = field(default_factory=list)

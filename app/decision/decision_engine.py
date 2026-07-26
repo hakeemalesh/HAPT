@@ -6,6 +6,7 @@ Evaluates market conditions and produces a trading
 decision based on a weighted scoring model.
 """
 
+from app.models.decision import Decision
 from app.rules.trading_rules import TradingRules
 
 
@@ -39,19 +40,13 @@ class DecisionEngine:
     def evaluate(self, context):
         """
         Evaluate market context.
-
-        Parameters
-        ----------
-        context : dict
-
-        Returns
-        -------
-        dict
         """
 
         score = 0
 
         details = {}
+
+        reasons = []
 
         # ------------------------------------------
         # EMA Alignment
@@ -61,9 +56,14 @@ class DecisionEngine:
 
         if trend == "Bullish":
             score += TradingRules.EMA_ALIGNMENT_SCORE
+            reasons.append("Bullish EMA alignment")
 
         elif trend == "Bearish":
             score += TradingRules.EMA_ALIGNMENT_SCORE
+            reasons.append("Bearish EMA alignment")
+
+        else:
+            reasons.append("No clear EMA trend")
 
         details["trend"] = trend
 
@@ -74,6 +74,8 @@ class DecisionEngine:
         if context.get("vwap") is not None:
             score += TradingRules.VWAP_SCORE
             details["vwap"] = "Available"
+            reasons.append("VWAP available")
+
         else:
             details["vwap"] = "Unavailable"
 
@@ -88,10 +90,12 @@ class DecisionEngine:
             if rsi >= TradingRules.RSI_BULLISH:
                 score += TradingRules.RSI_SCORE
                 details["rsi"] = "Bullish"
+                reasons.append("RSI confirms bullish momentum")
 
             elif rsi <= TradingRules.RSI_BEARISH:
                 score += TradingRules.RSI_SCORE
                 details["rsi"] = "Bearish"
+                reasons.append("RSI confirms bearish momentum")
 
             else:
                 details["rsi"] = "Neutral"
@@ -106,6 +110,8 @@ class DecisionEngine:
         if context.get("macd") is not None:
             score += TradingRules.MACD_SCORE
             details["macd"] = "Available"
+            reasons.append("MACD available")
+
         else:
             details["macd"] = "Unavailable"
 
@@ -121,6 +127,8 @@ class DecisionEngine:
         ):
             score += TradingRules.RELATIVE_VOLUME_SCORE
             details["volume"] = "High"
+            reasons.append("High relative volume")
+
         else:
             details["volume"] = "Normal"
 
@@ -131,6 +139,7 @@ class DecisionEngine:
         session_score = context.get("session_score")
 
         if session_score is not None:
+
             score += min(
                 session_score,
                 TradingRules.SESSION_MAX_SCORE
@@ -138,9 +147,16 @@ class DecisionEngine:
 
         details["session"] = context.get("session")
 
+        if context.get("session"):
+            reasons.append(
+                f"Trading during {context.get('session')}"
+            )
+
         # ------------------------------------------
         # Grade
         # ------------------------------------------
+
+        score = min(score, self.max_score)
 
         grade = self._grade(score)
 
@@ -157,18 +173,25 @@ class DecisionEngine:
         else:
             signal = "WAIT"
 
-        return {
+        decision = Decision()
 
-            "score": min(score, self.max_score),
+        decision.symbol = context.get("symbol", "")
 
-            "grade": grade,
+        decision.market = context.get("market", "")
 
-            "signal": signal,
+        decision.score = score
 
-            "confidence": min(score, self.max_score),
+        decision.confidence = score
 
-            "details": details
-        }
+        decision.grade = grade
+
+        decision.signal = signal
+
+        decision.reasons = reasons
+
+        decision.details = details
+
+        return decision
 
     def _trend(self, context):
         """

@@ -6,6 +6,8 @@ Evaluates market conditions and produces a trading
 decision based on a weighted scoring model.
 """
 
+from app.rules.trading_rules import TradingRules
+
 
 class DecisionEngine:
     """Evaluates trading quality."""
@@ -13,7 +15,26 @@ class DecisionEngine:
     def __init__(self):
         """Initialize scoring rules."""
 
-        self.max_score = 100
+        self.max_score = TradingRules.MAX_SCORE
+
+    def _grade(self, score):
+        """
+        Convert a score into a HAPT grade.
+        """
+
+        if score >= TradingRules.GRADE_A_PLUS:
+            return "A+"
+
+        if score >= TradingRules.GRADE_A:
+            return "A"
+
+        if score >= TradingRules.GRADE_B:
+            return "B"
+
+        if score >= TradingRules.GRADE_C:
+            return "C"
+
+        return "D"
 
     def evaluate(self, context):
         """
@@ -39,10 +60,10 @@ class DecisionEngine:
         trend = self._trend(context)
 
         if trend == "Bullish":
-            score += 20
+            score += TradingRules.EMA_ALIGNMENT_SCORE
 
         elif trend == "Bearish":
-            score += 20
+            score += TradingRules.EMA_ALIGNMENT_SCORE
 
         details["trend"] = trend
 
@@ -51,7 +72,7 @@ class DecisionEngine:
         # ------------------------------------------
 
         if context.get("vwap") is not None:
-            score += 20
+            score += TradingRules.VWAP_SCORE
             details["vwap"] = "Available"
         else:
             details["vwap"] = "Unavailable"
@@ -64,12 +85,12 @@ class DecisionEngine:
 
         if rsi is not None:
 
-            if rsi >= 60:
-                score += 15
+            if rsi >= TradingRules.RSI_BULLISH:
+                score += TradingRules.RSI_SCORE
                 details["rsi"] = "Bullish"
 
-            elif rsi <= 40:
-                score += 15
+            elif rsi <= TradingRules.RSI_BEARISH:
+                score += TradingRules.RSI_SCORE
                 details["rsi"] = "Bearish"
 
             else:
@@ -83,7 +104,7 @@ class DecisionEngine:
         # ------------------------------------------
 
         if context.get("macd") is not None:
-            score += 15
+            score += TradingRules.MACD_SCORE
             details["macd"] = "Available"
         else:
             details["macd"] = "Unavailable"
@@ -94,8 +115,11 @@ class DecisionEngine:
 
         rv = context.get("relative_volume")
 
-        if rv is not None and rv >= 1.2:
-            score += 15
+        if (
+            rv is not None
+            and rv >= TradingRules.RELATIVE_VOLUME_HIGH
+        ):
+            score += TradingRules.RELATIVE_VOLUME_SCORE
             details["volume"] = "High"
         else:
             details["volume"] = "Normal"
@@ -107,27 +131,37 @@ class DecisionEngine:
         session_score = context.get("session_score")
 
         if session_score is not None:
-            score += min(session_score, 15)
+            score += min(
+                session_score,
+                TradingRules.SESSION_MAX_SCORE
+            )
 
         details["session"] = context.get("session")
+
+        # ------------------------------------------
+        # Grade
+        # ------------------------------------------
+
+        grade = self._grade(score)
 
         # ------------------------------------------
         # Final Decision
         # ------------------------------------------
 
-        if score >= 90:
+        if grade in ("A+", "A"):
             signal = "BUY"
 
-        elif score >= 75:
-            signal = "BUY"
-
-        elif score >= 60:
+        elif grade in ("B", "C"):
             signal = "WATCH"
 
         else:
             signal = "WAIT"
 
         return {
+
+            "score": min(score, self.max_score),
+
+            "grade": grade,
 
             "signal": signal,
 

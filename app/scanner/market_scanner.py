@@ -20,9 +20,7 @@ class MarketScanner:
         self.symbols = symbols
 
     def validate_symbols(self):
-        """
-        Return only supported trading symbols.
-        """
+        """Return only supported trading symbols."""
 
         valid_symbols = []
 
@@ -31,6 +29,31 @@ class MarketScanner:
                 valid_symbols.append(symbol)
 
         return valid_symbols
+
+    def get_valid_instruments(self):
+        """
+        Return validated instrument information.
+
+        Each instrument is returned as a dictionary containing
+        the metadata required by downstream components.
+        """
+
+        instruments = []
+
+        for symbol in self.validate_symbols():
+
+            instruments.append(
+                {
+                    "symbol": symbol,
+                    "name": self.instrument_manager.get_name(symbol),
+                    "exchange": self.instrument_manager.get_exchange(symbol),
+                    "asset_type": self.instrument_manager.get_asset_type(symbol),
+                    "tick_size": self.instrument_manager.get_tick_size(symbol),
+                    "tick_value": self.instrument_manager.get_tick_value(symbol),
+                }
+            )
+
+        return instruments
 
     def scan(self):
         """Scan every loaded symbol."""

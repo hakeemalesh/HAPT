@@ -71,6 +71,39 @@ def test_validate_all_invalid():
     assert scanner.validate_symbols() == []
 
 
+def test_get_valid_instruments():
+    scanner = MarketScanner()
+
+    scanner.load_symbols([
+        "MES",
+        "MNQ",
+    ])
+
+    instruments = scanner.get_valid_instruments()
+
+    assert len(instruments) == 2
+
+    assert instruments[0]["name"] == "Micro E-mini S&P 500"
+    assert instruments[0]["exchange"] == "CME"
+
+    assert instruments[1]["name"] == "Micro E-mini Nasdaq-100"
+    assert instruments[1]["exchange"] == "CME"
+
+
+def test_get_valid_instruments_ignores_invalid():
+    scanner = MarketScanner()
+
+    scanner.load_symbols([
+        "MES",
+        "ABC",
+        "MNQ",
+    ])
+
+    instruments = scanner.get_valid_instruments()
+
+    assert len(instruments) == 2
+
+
 def test_scan_empty_list(capsys):
     scanner = MarketScanner()
 

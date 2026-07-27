@@ -92,3 +92,43 @@ class InstrumentManager:
         """Return specifications for a trading symbol."""
 
         return self.instruments.get(symbol.upper())
+
+    def is_supported(self, symbol):
+        """Return True if the symbol is supported."""
+
+        return symbol.upper() in self.instruments
+
+    def list_symbols(self):
+        """Return all supported symbols."""
+
+        return sorted(self.instruments.keys())
+
+    def get_name(self, symbol):
+        """Return the instrument name."""
+
+        specs = self.get_specs(symbol)
+        return specs.get("name") if specs else None
+
+    def get_exchange(self, symbol):
+        """Return the exchange."""
+
+        specs = self.get_specs(symbol)
+        return specs.get("exchange") if specs else None
+
+    def get_tick_size(self, symbol):
+        """Return the tick size."""
+
+        specs = self.get_specs(symbol)
+        return specs.get("tick_size") if specs else None
+
+    def get_tick_value(self, symbol):
+        """Return the tick value."""
+
+        specs = self.get_specs(symbol)
+        return specs.get("tick_value") if specs else None
+
+    def get_asset_type(self, symbol):
+        """Return the asset type."""
+
+        specs = self.get_specs(symbol)
+        return specs.get("asset_type") if specs else None

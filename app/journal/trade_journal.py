@@ -2,24 +2,34 @@
 HAPT Trade Journal
 ------------------
 
-Records trading decisions and trade history.
+Stores completed Trade objects for later analysis.
 """
+
+from app.models.trade import Trade
 
 
 class TradeJournal:
-    """Stores completed trades."""
+    """Stores completed HAPT trades."""
 
     def __init__(self):
-        self.trades = []
+        self._trades = []
 
-    def record_trade(self, trade):
-        """Save a completed trade."""
+    def add_trade(self, trade: Trade) -> None:
+        """Add a completed trade."""
 
-        self.trades.append(trade)
+        self._trades.append(trade)
 
-        print(f"Trade recorded: {trade['symbol']}")
-
-    def get_trades(self):
+    def get_trades(self) -> list[Trade]:
         """Return all recorded trades."""
 
-        return self.trades
+        return list(self._trades)
+
+    def count(self) -> int:
+        """Return the number of recorded trades."""
+
+        return len(self._trades)
+
+    def clear(self) -> None:
+        """Remove all recorded trades."""
+
+        self._trades.clear()

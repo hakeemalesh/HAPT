@@ -33,15 +33,11 @@ class MarketScanner:
     def get_valid_instruments(self):
         """
         Return validated instrument information.
-
-        Each instrument is returned as a dictionary containing
-        the metadata required by downstream components.
         """
 
         instruments = []
 
         for symbol in self.validate_symbols():
-
             instruments.append(
                 {
                     "symbol": symbol,
@@ -54,6 +50,27 @@ class MarketScanner:
             )
 
         return instruments
+
+    def get_market_data(self):
+        """
+        Return instrument information together with a
+        placeholder for market data.
+
+        A future MarketData component will replace the empty list
+        with historical OHLCV data.
+        """
+
+        datasets = []
+
+        for instrument in self.get_valid_instruments():
+            datasets.append(
+                {
+                    "instrument": instrument,
+                    "data": [],
+                }
+            )
+
+        return datasets
 
     def scan(self):
         """Scan every loaded symbol."""

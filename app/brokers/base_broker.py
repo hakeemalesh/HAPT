@@ -2,18 +2,28 @@
 HAPT Base Broker
 ----------------
 
-Defines the common interface for all brokers.
+Defines the common interface for all broker implementations.
 """
 
+from abc import ABC, abstractmethod
 
-class BaseBroker:
-    """Base class for every broker."""
 
-    def connect(self):
-        raise NotImplementedError
+class BaseBroker(ABC):
+    """Abstract base class for all broker implementations."""
 
-    def disconnect(self):
-        raise NotImplementedError
+    @abstractmethod
+    def connect(self) -> None:
+        """Connect to the broker."""
 
-    def place_order(self, symbol, side, quantity):
-        raise NotImplementedError
+    @abstractmethod
+    def disconnect(self) -> None:
+        """Disconnect from the broker."""
+
+    @abstractmethod
+    def place_order(
+        self,
+        symbol: str,
+        side: str,
+        quantity: int,
+    ) -> None:
+        """Place an order through the broker."""

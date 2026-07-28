@@ -5,7 +5,7 @@ Runs the application's startup checks.
 """
 
 
-def run_startup_checks():
+def run_startup_checks() -> None:
     """Run the initial startup checks."""
 
     print("Running startup checks...")

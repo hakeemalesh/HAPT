@@ -9,6 +9,7 @@ from app.datafeed.market_data import MarketData
 from app.processing.candle_processor import CandleProcessor
 from app.indicators.indicator_engine import IndicatorEngine
 from app.context.market_context import MarketContext
+from app.opportunity.opportunity_engine import OpportunityEngine
 
 
 class DataPipeline:
@@ -19,6 +20,7 @@ class DataPipeline:
 
         self.market_data = MarketData()
         self.market_context = MarketContext()
+        self.opportunity_engine = OpportunityEngine()
 
     def build_context(self, symbol):
         """
@@ -47,7 +49,13 @@ class DataPipeline:
             volumes=series["volumes"]
         )
 
-        return self.market_context.build(
-    symbol=symbol,
-    indicators=indicators,
-)
+        market_context = self.market_context.build(
+            symbol=symbol,
+            indicators=indicators,
+        )
+
+        market_context["opportunity"] = self.opportunity_engine.score(
+            market_context
+        )
+
+        return market_context

@@ -14,9 +14,9 @@ than individual data sources.
 """
 
 
-from datafeed.demo_historical_data import DemoHistoricalData
-from datafeed.data_provider import DataProvider
-from datafeed.historical_data import HistoricalData
+from app.datafeed.demo_historical_data import DemoHistoricalData
+from app.datafeed.data_provider import DataProvider
+from app.datafeed.historical_data import HistoricalData
 
 
 class MarketData:

@@ -9,7 +9,7 @@ market profile.
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from session.market_profiles import MARKET_PROFILES
+from app.session.market_profiles import MARKET_PROFILES
 
 
 class MarketSessionManager:

@@ -5,7 +5,7 @@ HAPT Market Context
 Creates a single source of truth for the current market.
 """
 
-from session.market_session_manager import MarketSessionManager
+from app.session.market_session_manager import MarketSessionManager
 
 
 class MarketContext:
@@ -16,12 +16,14 @@ class MarketContext:
 
         self.session_manager = MarketSessionManager(market)
 
-    def build(self, indicators):
+    def build(self, symbol, indicators):
         """
         Build the current market context.
 
         Parameters
         ----------
+        symbol : str
+
         indicators : dict
 
         Returns
@@ -36,6 +38,9 @@ class MarketContext:
         volume = indicators.get("volume", {})
 
         return {
+
+            # Instrument
+            "symbol": symbol,
 
             # Market Information
             "market": session["market"],

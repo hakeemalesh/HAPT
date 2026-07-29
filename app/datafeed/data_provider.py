@@ -5,7 +5,7 @@ HAPT Data Provider
 Selects the active market data source.
 """
 
-from datafeed.demo_data import DemoData
+from app.datafeed.demo_data import DemoData
 
 
 class DataProvider:

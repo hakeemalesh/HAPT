@@ -2,50 +2,46 @@
 HAPT AI Engine
 --------------
 
-Provides AI-powered analysis for trading opportunities.
+Provides AI-powered validation for trading opportunities.
 """
+
+from app.models.trade import Trade
 
 
 class AIEngine:
-    """Provides intelligent analysis for trading decisions."""
+    """Provides intelligent validation for trading decisions."""
 
     def __init__(self):
         """Initialize the AI engine."""
 
         self.model_name = "HAPT Professional AI"
 
-    def analyze(self, strategy_result):
-        """Analyze a strategy result using AI."""
+    def analyze(self, trade: Trade) -> Trade:
+        """
+        Analyze a Trade produced by the Strategy Engine.
 
-        print(f"AI is analyzing {strategy_result['symbol']}...")
+        For Version 1.0 this performs simple rule validation.
+        Later this will be expanded into the Professional
+        Opportunity Engine.
+        """
+
+        print(f"AI is analyzing {trade.symbol}...")
 
         # ----------------------------------------
-        # Placeholder AI Logic
-        # (Will later be replaced with real AI)
+        # Placeholder AI Validation
         # ----------------------------------------
 
-        ai_decision = "APPROVED"
-        ai_reason = "Trade satisfies current HAPT strategy rules."
+        if trade.approved:
+            trade.ai_decision = "APPROVED"
+            trade.ai_confidence = 90
+            trade.ai_reason = (
+                "Trade satisfies current HAPT strategy rules."
+            )
+        else:
+            trade.ai_decision = "REJECTED"
+            trade.ai_confidence = 40
+            trade.ai_reason = (
+                "Trade failed one or more strategy rules."
+            )
 
-        return {
-            "symbol": strategy_result["symbol"],
-
-            "trend": strategy_result["trend"],
-            "ema_alignment": strategy_result["ema_alignment"],
-            "vwap": strategy_result["vwap"],
-            "volume": strategy_result["volume"],
-            "momentum": strategy_result["momentum"],
-
-            "signal": strategy_result["signal"],
-            "confidence": strategy_result["confidence"],
-
-            "entry_price": strategy_result["entry_price"],
-            "stop_loss": strategy_result["stop_loss"],
-            "take_profit": strategy_result["take_profit"],
-
-            "risk": strategy_result["risk"],
-            "risk_reward": strategy_result["risk_reward"],
-
-            "ai_decision": ai_decision,
-            "ai_reason": ai_reason
-        }
+        return trade

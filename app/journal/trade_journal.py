@@ -19,6 +19,13 @@ class TradeJournal:
 
         self._trades.append(trade)
 
+    def record_trade(self, trade: Trade) -> None:
+        """
+        Backwards-compatible alias for add_trade().
+        """
+
+        self.add_trade(trade)
+
     def get_trades(self) -> list[Trade]:
         """Return all recorded trades."""
 

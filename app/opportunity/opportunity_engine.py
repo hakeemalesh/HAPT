@@ -13,9 +13,7 @@ class OpportunityEngine:
     """Calculates the market opportunity score."""
 
     def score(self, context):
-        """
-        Calculate the opportunity score.
-        """
+        """Calculate the opportunity score."""
 
         trend = self._trend(context)
 
@@ -29,6 +27,7 @@ class OpportunityEngine:
         volume_score = self._volume_score(context)
         atr_score = self._atr_score(context)
         vwap_score = self._vwap_score(context)
+        market_structure_score = self._market_structure_score(context)
         session_score = self._session_score(context)
 
         overall = (
@@ -37,13 +36,11 @@ class OpportunityEngine:
             + volume_score
             + atr_score
             + vwap_score
+            + market_structure_score
             + session_score
         )
 
-        overall = min(
-            overall,
-            TradingRules.MAX_SCORE
-        )
+        overall = min(overall, TradingRules.MAX_SCORE)
 
         return {
             "overall": overall,
@@ -52,6 +49,7 @@ class OpportunityEngine:
             "volume": volume_score,
             "atr": atr_score,
             "vwap": vwap_score,
+            "market_structure": market_structure_score,
             "session": session_score,
             "grade": self._grade(overall),
         }
@@ -136,6 +134,16 @@ class OpportunityEngine:
             return TradingRules.VWAP_GOOD_SCORE
 
         return TradingRules.VWAP_POOR_SCORE
+
+    def _market_structure_score(self, context):
+        """Calculate market structure score."""
+
+        structure = context.get("market_structure")
+
+        if structure in ("Bullish", "Bearish"):
+            return TradingRules.MARKET_STRUCTURE_GOOD_SCORE
+
+        return TradingRules.MARKET_STRUCTURE_POOR_SCORE
 
     def _session_score(self, context):
         """Calculate session score."""

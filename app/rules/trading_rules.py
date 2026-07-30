@@ -59,10 +59,15 @@ class TradingRules:
     ATR_POOR_SCORE = 0
 
     # ATR quality thresholds
-    # These are relative values and may be
-    # adjusted later for different markets.
     ATR_FAIR_THRESHOLD = 0.50
     ATR_GOOD_THRESHOLD = 1.00
+
+    # ----------------------------------
+    # Market Structure
+    # ----------------------------------
+
+    MARKET_STRUCTURE_GOOD_SCORE = 5
+    MARKET_STRUCTURE_POOR_SCORE = 0
 
     # ----------------------------------
     # Session

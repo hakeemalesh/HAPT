@@ -17,40 +17,28 @@ class OpportunityEngine:
 
         trend = self._trend(context)
 
-        trend_score = (
-            TradingRules.EMA_ALIGNMENT_SCORE
-            if trend in ("Bullish", "Bearish")
-            else 0
+        scores = {
+            "trend": (
+                TradingRules.EMA_ALIGNMENT_SCORE
+                if trend in ("Bullish", "Bearish")
+                else 0
+            ),
+            "momentum": self._momentum_score(context),
+            "volume": self._volume_score(context),
+            "atr": self._atr_score(context),
+            "vwap": self._vwap_score(context),
+            "market_structure": self._market_structure_score(context),
+            "session": self._session_score(context),
+        }
+
+        overall = min(
+            sum(scores.values()),
+            TradingRules.MAX_SCORE,
         )
-
-        momentum_score = self._momentum_score(context)
-        volume_score = self._volume_score(context)
-        atr_score = self._atr_score(context)
-        vwap_score = self._vwap_score(context)
-        market_structure_score = self._market_structure_score(context)
-        session_score = self._session_score(context)
-
-        overall = (
-            trend_score
-            + momentum_score
-            + volume_score
-            + atr_score
-            + vwap_score
-            + market_structure_score
-            + session_score
-        )
-
-        overall = min(overall, TradingRules.MAX_SCORE)
 
         return {
             "overall": overall,
-            "trend": trend_score,
-            "momentum": momentum_score,
-            "volume": volume_score,
-            "atr": atr_score,
-            "vwap": vwap_score,
-            "market_structure": market_structure_score,
-            "session": session_score,
+            **scores,
             "grade": self._grade(overall),
         }
 
@@ -150,7 +138,7 @@ class OpportunityEngine:
 
         return min(
             context.get("session_score", 0),
-            TradingRules.SESSION_MAX_SCORE
+            TradingRules.SESSION_MAX_SCORE,
         )
 
     def _grade(self, score):

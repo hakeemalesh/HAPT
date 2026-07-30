@@ -1,0 +1,89 @@
+"""
+HAPT Position Sizing Engine
+---------------------------
+
+Calculates position sizes while enforcing
+HAPT business rules.
+"""
+
+from math import floor
+
+from app.calculator.contract_calculator import ContractCalculator
+from app.instruments.instrument_manager import InstrumentManager
+from app.position_sizing.models import PositionSizingResult
+
+
+class PositionSizingEngine:
+    """
+    Calculates the maximum allowable position size.
+    """
+
+    def __init__(self):
+        self.instrument_manager = InstrumentManager()
+        self.contract_calculator = ContractCalculator()
+
+    def calculate(
+        self,
+        symbol: str,
+        account_risk: float,
+        stop_distance: float
+    ) -> PositionSizingResult:
+        """
+        Calculate the allowable position size.
+        """
+
+        if not self.instrument_manager.is_supported(symbol):
+            return PositionSizingResult(
+                valid=False,
+                symbol=symbol,
+                asset_type="Unknown",
+                contracts=0,
+                risk_per_contract=0.0,
+                total_risk=0.0,
+                remaining_risk=account_risk,
+                warnings=["Unsupported trading instrument."]
+            )
+
+        asset_type = self.instrument_manager.get_asset_type(symbol)
+        dollar_per_point = self.instrument_manager.get_dollar_per_point(symbol)
+
+        risk_per_contract = self.contract_calculator.calculate_risk_amount(
+            stop_distance,
+            dollar_per_point
+        )
+
+        raw_position_size = self.contract_calculator.calculate_position_size(
+            account_risk,
+            stop_distance,
+            dollar_per_point
+        )
+
+        contracts = floor(raw_position_size)
+
+        if contracts < 1:
+            return PositionSizingResult(
+                valid=False,
+                symbol=symbol,
+                asset_type=asset_type,
+                contracts=0,
+                risk_per_contract=risk_per_contract,
+                total_risk=0.0,
+                remaining_risk=account_risk,
+                warnings=[
+                    "Risk is too small to open one contract."
+                ]
+            )
+
+        total_risk = contracts * risk_per_contract
+        remaining_risk = account_risk - total_risk
+
+        return PositionSizingResult(
+            valid=True,
+            symbol=symbol,
+            asset_type=asset_type,
+            contracts=contracts,
+            risk_per_contract=risk_per_contract,
+            total_risk=total_risk,
+            remaining_risk=remaining_risk,
+            warnings=[]
+        )

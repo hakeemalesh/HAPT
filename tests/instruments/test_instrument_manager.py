@@ -57,6 +57,14 @@ def test_get_tick_value():
     assert manager.get_tick_value("MES") == 1.25
 
 
+def test_get_dollar_per_point():
+    """MES dollar value per point."""
+
+    manager = InstrumentManager()
+
+    assert manager.get_dollar_per_point("MES") == 5.00
+
+
 def test_get_asset_type():
     """MES asset type."""
 
@@ -81,5 +89,6 @@ def test_unknown_symbol_returns_none():
     assert manager.get_exchange("XYZ") is None
     assert manager.get_tick_size("XYZ") is None
     assert manager.get_tick_value("XYZ") is None
+    assert manager.get_dollar_per_point("XYZ") is None
     assert manager.get_asset_type("XYZ") is None
     assert manager.get_name("XYZ") is None

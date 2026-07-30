@@ -127,6 +127,12 @@ class InstrumentManager:
         specs = self.get_specs(symbol)
         return specs.get("tick_value") if specs else None
 
+    def get_dollar_per_point(self, symbol):
+        """Return the dollar value per point."""
+
+        specs = self.get_specs(symbol)
+        return specs.get("dollar_per_point") if specs else None
+
     def get_asset_type(self, symbol):
         """Return the asset type."""
 

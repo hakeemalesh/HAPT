@@ -20,6 +20,7 @@ class OpportunityEngine:
         trend_score = 0
         momentum_score = 0
         volume_score = 0
+        atr_score = 0
         session_score = 0
 
         # -----------------------------
@@ -60,6 +61,12 @@ class OpportunityEngine:
             volume_score = TradingRules.RELATIVE_VOLUME_SCORE
 
         # -----------------------------
+        # ATR
+        # -----------------------------
+
+        atr_score = self._atr_score(context)
+
+        # -----------------------------
         # Session
         # -----------------------------
 
@@ -76,6 +83,7 @@ class OpportunityEngine:
             trend_score
             + momentum_score
             + volume_score
+            + atr_score
             + session_score
         )
 
@@ -89,6 +97,7 @@ class OpportunityEngine:
             "trend": trend_score,
             "momentum": momentum_score,
             "volume": volume_score,
+            "atr": atr_score,
             "session": session_score,
             "grade": self._grade(overall),
         }
@@ -111,6 +120,22 @@ class OpportunityEngine:
             return "Bearish"
 
         return "Sideways"
+
+    def _atr_score(self, context):
+        """Calculate ATR volatility score."""
+
+        atr = context.get("atr")
+
+        if atr is None:
+            return TradingRules.ATR_POOR_SCORE
+
+        if atr >= TradingRules.ATR_GOOD_THRESHOLD:
+            return TradingRules.ATR_GOOD_SCORE
+
+        if atr >= TradingRules.ATR_FAIR_THRESHOLD:
+            return TradingRules.ATR_FAIR_SCORE
+
+        return TradingRules.ATR_POOR_SCORE
 
     def _grade(self, score):
         """Convert score into grade."""

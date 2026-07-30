@@ -49,11 +49,19 @@ class TradingRules:
     RELATIVE_VOLUME_SCORE = 15
 
     # ----------------------------------
-    # ATR
+    # ATR Volatility
     # ----------------------------------
 
-    ATR_SCORE = 10
+    # ATR quality scores
+    ATR_GOOD_SCORE = 10
+    ATR_FAIR_SCORE = 5
+    ATR_POOR_SCORE = 0
 
+    # ATR quality thresholds
+    # These are relative values and may be
+    # adjusted later for different markets.
+    ATR_FAIR_THRESHOLD = 0.50
+    ATR_GOOD_THRESHOLD = 1.00
     # ----------------------------------
     # Session
     # ----------------------------------

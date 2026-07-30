@@ -35,6 +35,7 @@ class TestOpportunityEngine(unittest.TestCase):
         self.assertIn("trend", result)
         self.assertIn("momentum", result)
         self.assertIn("volume", result)
+        self.assertIn("atr", result)
         self.assertIn("session", result)
         self.assertIn("grade", result)
 
@@ -174,6 +175,44 @@ class TestOpportunityEngine(unittest.TestCase):
         self.assertEqual(
             result["momentum"],
             TradingRules.MACD_SCORE
+        )
+
+    def test_poor_atr_score(self):
+        """Missing ATR should score zero."""
+
+        result = self.engine.score({})
+
+        self.assertEqual(
+            result["atr"],
+            TradingRules.ATR_POOR_SCORE
+        )
+
+    def test_fair_atr_score(self):
+        """Fair ATR should award fair points."""
+
+        context = {
+            "atr": TradingRules.ATR_FAIR_THRESHOLD
+        }
+
+        result = self.engine.score(context)
+
+        self.assertEqual(
+            result["atr"],
+            TradingRules.ATR_FAIR_SCORE
+        )
+
+    def test_good_atr_score(self):
+        """Good ATR should award maximum ATR points."""
+
+        context = {
+            "atr": TradingRules.ATR_GOOD_THRESHOLD
+        }
+
+        result = self.engine.score(context)
+
+        self.assertEqual(
+            result["atr"],
+            TradingRules.ATR_GOOD_SCORE
         )
 
 

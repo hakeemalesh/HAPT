@@ -17,67 +17,18 @@ class OpportunityEngine:
         Calculate the opportunity score.
         """
 
-        trend_score = 0
-        momentum_score = 0
-        volume_score = 0
-        atr_score = 0
-        session_score = 0
-
-        # -----------------------------
-        # Trend
-        # -----------------------------
-
         trend = self._trend(context)
 
-        if trend in ("Bullish", "Bearish"):
-            trend_score = TradingRules.EMA_ALIGNMENT_SCORE
-
-        # -----------------------------
-        # Momentum
-        # -----------------------------
-
-        rsi = context.get("rsi")
-
-        if rsi is not None:
-            if (
-                rsi >= TradingRules.RSI_BULLISH
-                or rsi <= TradingRules.RSI_BEARISH
-            ):
-                momentum_score += TradingRules.RSI_SCORE
-
-        if context.get("macd") is not None:
-            momentum_score += TradingRules.MACD_SCORE
-
-        # -----------------------------
-        # Volume
-        # -----------------------------
-
-        rv = context.get("relative_volume")
-
-        if (
-            rv is not None
-            and rv >= TradingRules.RELATIVE_VOLUME_HIGH
-        ):
-            volume_score = TradingRules.RELATIVE_VOLUME_SCORE
-
-        # -----------------------------
-        # ATR
-        # -----------------------------
-
-        atr_score = self._atr_score(context)
-
-        # -----------------------------
-        # Session
-        # -----------------------------
-
-        session_score = min(
-            context.get("session_score", 0),
-            TradingRules.SESSION_MAX_SCORE
+        trend_score = (
+            TradingRules.EMA_ALIGNMENT_SCORE
+            if trend in ("Bullish", "Bearish")
+            else 0
         )
 
-        # -----------------------------
-        # Overall
-        # -----------------------------
+        momentum_score = self._momentum_score(context)
+        volume_score = self._volume_score(context)
+        atr_score = self._atr_score(context)
+        session_score = self._session_score(context)
 
         overall = (
             trend_score
@@ -121,6 +72,38 @@ class OpportunityEngine:
 
         return "Sideways"
 
+    def _momentum_score(self, context):
+        """Calculate momentum score."""
+
+        score = 0
+
+        rsi = context.get("rsi")
+
+        if rsi is not None:
+            if (
+                rsi >= TradingRules.RSI_BULLISH
+                or rsi <= TradingRules.RSI_BEARISH
+            ):
+                score += TradingRules.RSI_SCORE
+
+        if context.get("macd") is not None:
+            score += TradingRules.MACD_SCORE
+
+        return score
+
+    def _volume_score(self, context):
+        """Calculate relative volume score."""
+
+        rv = context.get("relative_volume")
+
+        if (
+            rv is not None
+            and rv >= TradingRules.RELATIVE_VOLUME_HIGH
+        ):
+            return TradingRules.RELATIVE_VOLUME_SCORE
+
+        return 0
+
     def _atr_score(self, context):
         """Calculate ATR volatility score."""
 
@@ -136,6 +119,14 @@ class OpportunityEngine:
             return TradingRules.ATR_FAIR_SCORE
 
         return TradingRules.ATR_POOR_SCORE
+
+    def _session_score(self, context):
+        """Calculate session score."""
+
+        return min(
+            context.get("session_score", 0),
+            TradingRules.SESSION_MAX_SCORE
+        )
 
     def _grade(self, score):
         """Convert score into grade."""

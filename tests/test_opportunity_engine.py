@@ -36,6 +36,7 @@ class TestOpportunityEngine(unittest.TestCase):
         self.assertIn("momentum", result)
         self.assertIn("volume", result)
         self.assertIn("atr", result)
+        self.assertIn("vwap", result)
         self.assertIn("session", result)
         self.assertIn("grade", result)
 
@@ -213,6 +214,61 @@ class TestOpportunityEngine(unittest.TestCase):
         self.assertEqual(
             result["atr"],
             TradingRules.ATR_GOOD_SCORE
+        )
+
+    def test_missing_vwap_score(self):
+        """Missing VWAP data should score zero."""
+
+        result = self.engine.score({})
+
+        self.assertEqual(
+            result["vwap"],
+            TradingRules.VWAP_POOR_SCORE
+        )
+
+    def test_price_above_vwap(self):
+        """Price above VWAP should award VWAP points."""
+
+        context = {
+            "price": 101.0,
+            "vwap": 100.0,
+        }
+
+        result = self.engine.score(context)
+
+        self.assertEqual(
+            result["vwap"],
+            TradingRules.VWAP_GOOD_SCORE
+        )
+
+    def test_price_equal_vwap(self):
+        """Price equal to VWAP should award VWAP points."""
+
+        context = {
+            "price": 100.0,
+            "vwap": 100.0,
+        }
+
+        result = self.engine.score(context)
+
+        self.assertEqual(
+            result["vwap"],
+            TradingRules.VWAP_GOOD_SCORE
+        )
+
+    def test_price_below_vwap(self):
+        """Price below VWAP should score zero."""
+
+        context = {
+            "price": 99.0,
+            "vwap": 100.0,
+        }
+
+        result = self.engine.score(context)
+
+        self.assertEqual(
+            result["vwap"],
+            TradingRules.VWAP_POOR_SCORE
         )
 
 

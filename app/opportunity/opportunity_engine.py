@@ -28,6 +28,7 @@ class OpportunityEngine:
         momentum_score = self._momentum_score(context)
         volume_score = self._volume_score(context)
         atr_score = self._atr_score(context)
+        vwap_score = self._vwap_score(context)
         session_score = self._session_score(context)
 
         overall = (
@@ -35,6 +36,7 @@ class OpportunityEngine:
             + momentum_score
             + volume_score
             + atr_score
+            + vwap_score
             + session_score
         )
 
@@ -49,6 +51,7 @@ class OpportunityEngine:
             "momentum": momentum_score,
             "volume": volume_score,
             "atr": atr_score,
+            "vwap": vwap_score,
             "session": session_score,
             "grade": self._grade(overall),
         }
@@ -119,6 +122,20 @@ class OpportunityEngine:
             return TradingRules.ATR_FAIR_SCORE
 
         return TradingRules.ATR_POOR_SCORE
+
+    def _vwap_score(self, context):
+        """Calculate VWAP position score."""
+
+        price = context.get("price")
+        vwap = context.get("vwap")
+
+        if price is None or vwap is None:
+            return TradingRules.VWAP_POOR_SCORE
+
+        if price >= vwap:
+            return TradingRules.VWAP_GOOD_SCORE
+
+        return TradingRules.VWAP_POOR_SCORE
 
     def _session_score(self, context):
         """Calculate session score."""

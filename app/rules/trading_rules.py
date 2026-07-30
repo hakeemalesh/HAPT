@@ -39,7 +39,8 @@ class TradingRules:
     # VWAP
     # ----------------------------------
 
-    VWAP_SCORE = 20
+    VWAP_GOOD_SCORE = 10
+    VWAP_POOR_SCORE = 0
 
     # ----------------------------------
     # Relative Volume
@@ -62,6 +63,7 @@ class TradingRules:
     # adjusted later for different markets.
     ATR_FAIR_THRESHOLD = 0.50
     ATR_GOOD_THRESHOLD = 1.00
+
     # ----------------------------------
     # Session
     # ----------------------------------

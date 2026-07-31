@@ -42,20 +42,28 @@ class DataPipeline:
 
         series = CandleProcessor.extract(candles)
 
+        if not series:
+            return None
+
         indicators = IndicatorEngine.calculate(
             closes=series["closes"],
             highs=series["highs"],
             lows=series["lows"],
-            volumes=series["volumes"]
+            volumes=series["volumes"],
         )
+
+        if not indicators:
+            return None
 
         market_context = self.market_context.build(
             symbol=symbol,
             indicators=indicators,
         )
 
-        market_context["opportunity"] = self.opportunity_engine.score(
-            market_context
+        market_context["opportunity"] = (
+            self.opportunity_engine.score(
+                market_context
+            )
         )
 
         return market_context

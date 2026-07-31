@@ -11,12 +11,20 @@ from app.models.trade import Trade
 class TradeDisplay:
     """Displays trading information."""
 
-    def show(self, trade: Trade):
-        """Display a completed trade setup."""
+    def show(self, trade: Trade) -> None:
+        """
+        Display a completed trade setup.
+        """
 
-        print("\n========================================")
+        if not isinstance(trade, Trade):
+            raise TypeError(
+                "trade must be a Trade instance."
+            )
+
+        print()
+        print("=" * 40)
         print("           HAPT TRADE SETUP")
-        print("========================================")
+        print("=" * 40)
 
         print(f"Symbol         : {trade.symbol}")
         print(f"Market         : {trade.market}")
@@ -24,35 +32,54 @@ class TradeDisplay:
         print(f"Status         : {trade.status}")
         print(f"Grade          : {trade.grade}")
 
-        print("----------------------------------------")
+        print("-" * 40)
 
         print(f"Entry Price    : {trade.entry_price}")
         print(f"Stop Loss      : {trade.stop_loss}")
         print(f"Target Price   : {trade.target_price}")
 
-        print("----------------------------------------")
+        print("-" * 40)
 
         print(f"Position Size  : {trade.position_size}")
         print(f"Risk Amount    : {trade.risk_amount}")
         print(f"Risk/Reward    : {trade.risk_reward}")
 
-        print("----------------------------------------")
+        print("-" * 40)
 
         print(f"Approved       : {trade.approved}")
 
-        if hasattr(trade, "ai_decision"):
-            print(f"AI Decision    : {trade.ai_decision}")
+        ai_decision = getattr(
+            trade,
+            "ai_decision",
+            None,
+        )
 
-        if hasattr(trade, "ai_confidence"):
-            print(f"AI Confidence  : {trade.ai_confidence}%")
+        ai_confidence = getattr(
+            trade,
+            "ai_confidence",
+            None,
+        )
 
-        if hasattr(trade, "ai_reason"):
-            print(f"AI Reason      : {trade.ai_reason}")
+        ai_reason = getattr(
+            trade,
+            "ai_reason",
+            None,
+        )
+
+        if ai_decision is not None:
+            print(f"AI Decision    : {ai_decision}")
+
+        if ai_confidence is not None:
+            print(f"AI Confidence  : {ai_confidence}%")
+
+        if ai_reason:
+            print(f"AI Reason      : {ai_reason}")
 
         if trade.notes:
-            print("----------------------------------------")
+            print("-" * 40)
             print("Notes:")
-            for note in trade.notes:
-                print(f" - {note}")
 
-        print("========================================")
+            for note in trade.notes:
+                print(f" • {note}")
+
+        print("=" * 40)

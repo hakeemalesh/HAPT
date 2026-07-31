@@ -20,7 +20,9 @@ Trade Model
 
 from app.calculator.contract_calculator import ContractCalculator
 from app.decision.decision_engine import DecisionEngine
-from app.instruments.instrument_manager import InstrumentManager
+from app.position_sizing.position_sizing_engine import (
+    PositionSizingEngine,
+)
 from app.models.trade import Trade
 from app.risk.risk_manager import RiskManager
 
@@ -36,7 +38,7 @@ class StrategyEngine:
 
         self.decision_engine = DecisionEngine()
         self.risk_manager = RiskManager()
-        self.instrument_manager = InstrumentManager()
+        self.position_sizing_engine = PositionSizingEngine()
         self.contract_calculator = ContractCalculator()
 
     def analyze(
@@ -81,20 +83,7 @@ class StrategyEngine:
 
             return trade
 
-        #
-        # Instrument specifications
-        #
-        specs = self.instrument_manager.get_specs(
-            decision.symbol
-        )
-
-        if specs:
-            dollar_per_point = specs.get(
-                "dollar_per_point",
-                5.0,
-            )
-        else:
-            dollar_per_point = 5.0
+        
 
         #
         # Trade prices
@@ -132,6 +121,14 @@ class StrategyEngine:
             )
 
         #
+        # Position Sizing
+        #
+        position = self.position_sizing_engine.calculate(
+            symbol=decision.symbol,
+            account_risk=self.risk_manager.get_max_risk(),
+            stop_distance=stop_distance,
+        )
+        #
         # Risk Evaluation
         #
         risk = self.risk_manager.evaluate(
@@ -139,7 +136,7 @@ class StrategyEngine:
             entry_price=entry_price,
             stop_loss=stop_loss,
             target_price=target_price,
-            dollar_per_point=dollar_per_point,
+            position_size=position.contracts,
         )
 
         #

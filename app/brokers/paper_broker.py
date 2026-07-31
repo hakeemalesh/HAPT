@@ -6,25 +6,35 @@ Simulates a broker without risking real money.
 """
 
 from app.brokers.base_broker import BaseBroker
+from app.core.logger import setup_logger
 
 
 class PaperBroker(BaseBroker):
     """Paper trading broker implementation."""
 
     def __init__(self) -> None:
+        """Initialize the paper broker."""
+
         self.connected = False
+        self.logger = setup_logger()
 
     def connect(self) -> None:
         """Connect to the paper broker."""
 
         self.connected = True
-        print("Paper Broker connected.")
+
+        self.logger.info(
+            "Paper Broker connected."
+        )
 
     def disconnect(self) -> None:
         """Disconnect from the paper broker."""
 
         self.connected = False
-        print("Paper Broker disconnected.")
+
+        self.logger.info(
+            "Paper Broker disconnected."
+        )
 
     def place_order(
         self,
@@ -42,22 +52,37 @@ class PaperBroker(BaseBroker):
         """
 
         if not self.connected:
-            print("Paper Broker is not connected.")
+
+            self.logger.error(
+                "Paper Broker is not connected."
+            )
+
             return False
 
         side = side.upper()
 
         if side not in ("BUY", "SELL"):
-            print(f"Invalid order side: {side}")
+
+            self.logger.error(
+                "Invalid order side: %s",
+                side,
+            )
+
             return False
 
         if quantity <= 0:
-            print("Quantity must be greater than zero.")
+
+            self.logger.error(
+                "Quantity must be greater than zero."
+            )
+
             return False
 
-        print(
-            f"Paper Trade -> "
-            f"{side} {quantity} contract(s) of {symbol}"
+        self.logger.info(
+            "Paper Trade -> %s %d contract(s) of %s",
+            side,
+            quantity,
+            symbol,
         )
 
         return True

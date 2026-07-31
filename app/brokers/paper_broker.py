@@ -16,11 +16,13 @@ class PaperBroker(BaseBroker):
 
     def connect(self) -> None:
         """Connect to the paper broker."""
+
         self.connected = True
         print("Paper Broker connected.")
 
     def disconnect(self) -> None:
         """Disconnect from the paper broker."""
+
         self.connected = False
         print("Paper Broker disconnected.")
 
@@ -29,8 +31,33 @@ class PaperBroker(BaseBroker):
         symbol: str,
         side: str,
         quantity: int,
-    ) -> None:
-        """Simulate placing a paper trade."""
+    ) -> bool:
+        """
+        Simulate placing a paper trade.
+
+        Returns
+        -------
+        bool
+            True if the simulated order was accepted.
+        """
+
+        if not self.connected:
+            print("Paper Broker is not connected.")
+            return False
+
+        side = side.upper()
+
+        if side not in ("BUY", "SELL"):
+            print(f"Invalid order side: {side}")
+            return False
+
+        if quantity <= 0:
+            print("Quantity must be greater than zero.")
+            return False
+
         print(
-            f"Paper Trade -> {side} {quantity} contract(s) of {symbol}"
+            f"Paper Trade -> "
+            f"{side} {quantity} contract(s) of {symbol}"
         )
+
+        return True

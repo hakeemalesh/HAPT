@@ -58,6 +58,11 @@ def main():
     market.load_default_watchlist()
     symbols = market.get_symbols()
 
+    logger.info(
+        "Loaded %d trading instruments.",
+        len(symbols),
+    )
+
     # --------------------------------------------------
     # Market Scanner
     # --------------------------------------------------
@@ -71,6 +76,8 @@ def main():
 
     for symbol in symbols:
 
+        logger.info("Analyzing %s", symbol)
+
         price = data.get_price(symbol)
 
         if price is None:
@@ -82,39 +89,49 @@ def main():
 
         print(f"Current price of {symbol}: {price}")
 
-        # Build complete market intelligence context
         market_context = pipeline.build_context(symbol)
 
         if market_context is None:
-            print(f"No historical data available for {symbol}")
+            logger.warning(
+                "No historical data available for %s",
+                symbol,
+            )
             continue
-
-        # --------------------------------------------------
-        # Run Strategy Engine
-        # --------------------------------------------------
 
         strategy_result = strategy.analyze(
             market_context,
             price,
         )
 
-        # --------------------------------------------------
-        # AI Validation
-        # --------------------------------------------------
-
         ai_result = ai.analyze(strategy_result)
 
-        # --------------------------------------------------
-        # Display Trade
-        # --------------------------------------------------
+        #
+        # Execute Paper Trade
+        #
+        if ai_result.approved:
 
-        display.show(strategy_result)
+            broker.place_order(
+                symbol=ai_result.symbol,
+                side=ai_result.signal,
+                quantity=int(ai_result.position_size),
+            )
 
-        # --------------------------------------------------
+        #
+        # Display
+        #
+        display.show(ai_result)
+
+        #
         # Journal
-        # --------------------------------------------------
-
+        #
         journal.record_trade(ai_result)
+
+    logger.info(
+        "Recorded %d trades.",
+        journal.count(),
+    )
+
+    broker.disconnect()
 
     logger.info(
         "HAPT completed one market scan successfully."

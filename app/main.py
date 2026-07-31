@@ -73,6 +73,13 @@ def main():
 
         price = data.get_price(symbol)
 
+        if price is None:
+            logger.warning(
+                "No current price available for %s",
+                symbol,
+            )
+            continue
+
         print(f"Current price of {symbol}: {price}")
 
         # Build complete market intelligence context

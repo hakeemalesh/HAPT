@@ -31,7 +31,22 @@ class MarketContext:
         dict
         """
 
+        if not symbol:
+            raise ValueError(
+                "Symbol cannot be empty."
+            )
+
+        if not indicators:
+            raise ValueError(
+                "Indicators cannot be empty."
+            )
+
         session = self.session_manager.get_market_context()
+
+        if not session:
+            raise ValueError(
+                "Market session information unavailable."
+            )
 
         ema = indicators.get("ema", {})
         macd = indicators.get("macd", {})
@@ -43,14 +58,14 @@ class MarketContext:
             "symbol": symbol,
 
             # Market Information
-            "market": session["market"],
-            "timezone": session["timezone"],
-            "current_time": session["current_time"],
-            "market_open": session["market_open"],
+            "market": session.get("market"),
+            "timezone": session.get("timezone"),
+            "current_time": session.get("current_time"),
+            "market_open": session.get("market_open"),
 
             # Session
-            "session": session["session"],
-            "session_score": session["session_score"],
+            "session": session.get("session"),
+            "session_score": session.get("session_score"),
 
             # Indicators
             "ema_9": ema.get("ema_9"),

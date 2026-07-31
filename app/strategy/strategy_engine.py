@@ -165,17 +165,16 @@ class StrategyEngine:
 
         trade.approved = risk.approved
 
-        trade.notes.extend(
-            decision.reasons
-        )
+        trade.notes.extend(decision.reasons)
 
-        trade.notes.extend(
-            risk.notes
-        )
+        for note in risk.notes:
+            if note not in trade.notes:
+                trade.notes.append(note)
 
-        if risk.approved:
-            trade.status = "APPROVED"
-        else:
-            trade.status = "REJECTED"
+        trade.status = (
+            "APPROVED"
+            if risk.approved
+            else "REJECTED"
+        )
 
         return trade

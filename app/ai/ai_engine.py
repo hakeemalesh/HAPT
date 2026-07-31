@@ -25,19 +25,41 @@ class AIEngine:
         Opportunity Engine.
         """
 
-        print(f"AI is analyzing {trade.symbol}...")
+        print(
+            f"{self.model_name} is analyzing "
+            f"{trade.symbol}..."
+        )
+
+        #
+        # Defensive validation
+        #
+        if trade is None:
+            raise ValueError(
+                "Trade cannot be None."
+            )
+
+        if not trade.symbol:
+            trade.ai_decision = "INVALID"
+            trade.ai_confidence = 0
+            trade.ai_reason = (
+                "Trade symbol is missing."
+            )
+            return trade
 
         # ----------------------------------------
         # Placeholder AI Validation
         # ----------------------------------------
 
         if trade.approved:
+
             trade.ai_decision = "APPROVED"
             trade.ai_confidence = 90
             trade.ai_reason = (
                 "Trade satisfies current HAPT strategy rules."
             )
+
         else:
+
             trade.ai_decision = "REJECTED"
             trade.ai_confidence = 40
             trade.ai_reason = (

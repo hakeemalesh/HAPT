@@ -5,6 +5,7 @@ HAPT AI Engine
 Provides AI-powered validation for trading opportunities.
 """
 
+from app.core.logger import setup_logger
 from app.models.trade import Trade
 
 
@@ -15,6 +16,7 @@ class AIEngine:
         """Initialize the AI engine."""
 
         self.model_name = "HAPT Professional AI"
+        self.logger = setup_logger()
 
     def analyze(self, trade: Trade) -> Trade:
         """
@@ -25,11 +27,6 @@ class AIEngine:
         Opportunity Engine.
         """
 
-        print(
-            f"{self.model_name} is analyzing "
-            f"{trade.symbol}..."
-        )
-
         #
         # Defensive validation
         #
@@ -38,12 +35,24 @@ class AIEngine:
                 "Trade cannot be None."
             )
 
+        self.logger.info(
+            "%s is analyzing %s",
+            self.model_name,
+            trade.symbol,
+        )
+
         if not trade.symbol:
+
             trade.ai_decision = "INVALID"
             trade.ai_confidence = 0
             trade.ai_reason = (
                 "Trade symbol is missing."
             )
+
+            self.logger.warning(
+                "AI rejected trade because the symbol is missing."
+            )
+
             return trade
 
         # ----------------------------------------
@@ -65,5 +74,11 @@ class AIEngine:
             trade.ai_reason = (
                 "Trade failed one or more strategy rules."
             )
+
+        self.logger.info(
+            "AI Decision: %s (%d%% confidence)",
+            trade.ai_decision,
+            trade.ai_confidence,
+        )
 
         return trade

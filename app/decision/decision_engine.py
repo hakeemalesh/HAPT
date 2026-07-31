@@ -75,7 +75,6 @@ class DecisionEngine:
             score += TradingRules.VWAP_SCORE
             details["vwap"] = "Available"
             reasons.append("VWAP available")
-
         else:
             details["vwap"] = "Unavailable"
 
@@ -90,12 +89,16 @@ class DecisionEngine:
             if rsi >= TradingRules.RSI_BULLISH:
                 score += TradingRules.RSI_SCORE
                 details["rsi"] = "Bullish"
-                reasons.append("RSI confirms bullish momentum")
+                reasons.append(
+                    "RSI confirms bullish momentum"
+                )
 
             elif rsi <= TradingRules.RSI_BEARISH:
                 score += TradingRules.RSI_SCORE
                 details["rsi"] = "Bearish"
-                reasons.append("RSI confirms bearish momentum")
+                reasons.append(
+                    "RSI confirms bearish momentum"
+                )
 
             else:
                 details["rsi"] = "Neutral"
@@ -111,7 +114,6 @@ class DecisionEngine:
             score += TradingRules.MACD_SCORE
             details["macd"] = "Available"
             reasons.append("MACD available")
-
         else:
             details["macd"] = "Unavailable"
 
@@ -127,8 +129,9 @@ class DecisionEngine:
         ):
             score += TradingRules.RELATIVE_VOLUME_SCORE
             details["volume"] = "High"
-            reasons.append("High relative volume")
-
+            reasons.append(
+                "High relative volume"
+            )
         else:
             details["volume"] = "Normal"
 
@@ -142,10 +145,13 @@ class DecisionEngine:
 
             score += min(
                 session_score,
-                TradingRules.SESSION_MAX_SCORE
+                TradingRules.SESSION_MAX_SCORE,
             )
 
-        details["session"] = context.get("session")
+        details["session"] = context.get(
+            "session",
+            "Unknown",
+        )
 
         if context.get("session"):
             reasons.append(
@@ -175,13 +181,22 @@ class DecisionEngine:
 
         decision = Decision()
 
-        decision.symbol = context.get("symbol", "")
+        decision.symbol = context.get(
+            "symbol",
+            "",
+        )
 
-        decision.market = context.get("market", "")
+        decision.market = context.get(
+            "market",
+            "",
+        )
 
         decision.score = score
 
-        decision.confidence = score
+        decision.confidence = min(
+            score,
+            100,
+        )
 
         decision.grade = grade
 
@@ -203,7 +218,15 @@ class DecisionEngine:
         ema50 = context.get("ema_50")
         ema200 = context.get("ema_200")
 
-        if None in (ema9, ema20, ema50, ema200):
+        if any(
+            value is None
+            for value in (
+                ema9,
+                ema20,
+                ema50,
+                ema200,
+            )
+        ):
             return "Unknown"
 
         if ema9 > ema20 > ema50 > ema200:

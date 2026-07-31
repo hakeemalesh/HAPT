@@ -12,6 +12,9 @@ Market Context
 Decision Engine
       │
       ▼
+PositionSizingEngine
+      │
+      ▼
 Risk Manager
       │
       ▼
@@ -83,8 +86,6 @@ class StrategyEngine:
 
             return trade
 
-        
-
         #
         # Trade prices
         #
@@ -128,6 +129,18 @@ class StrategyEngine:
             account_risk=self.risk_manager.get_max_risk(),
             stop_distance=stop_distance,
         )
+
+        #
+        # Validate Position Size
+        #
+        if not position.valid:
+
+            trade.approved = False
+            trade.status = "REJECTED"
+            trade.notes.extend(position.warnings)
+
+            return trade
+
         #
         # Risk Evaluation
         #
@@ -146,21 +159,11 @@ class StrategyEngine:
         trade.stop_loss = risk.stop_loss
         trade.target_price = risk.target_price
 
-        trade.position_size = (
-            risk.position_size
-        )
+        trade.position_size = risk.position_size
+        trade.risk_amount = risk.risk_amount
+        trade.risk_reward = risk.risk_reward
 
-        trade.risk_amount = (
-            risk.risk_amount
-        )
-
-        trade.risk_reward = (
-            risk.risk_reward
-        )
-
-        trade.approved = (
-            risk.approved
-        )
+        trade.approved = risk.approved
 
         trade.notes.extend(
             decision.reasons

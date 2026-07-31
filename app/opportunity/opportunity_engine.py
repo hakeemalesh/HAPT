@@ -27,7 +27,9 @@ class OpportunityEngine:
             "volume": self._volume_score(context),
             "atr": self._atr_score(context),
             "vwap": self._vwap_score(context),
-            "market_structure": self._market_structure_score(context),
+            "market_structure": self._market_structure_score(
+                context
+            ),
             "session": self._session_score(context),
         }
 
@@ -68,12 +70,14 @@ class OpportunityEngine:
 
         rsi = context.get("rsi")
 
-        if rsi is not None:
-            if (
+        if (
+            rsi is not None
+            and (
                 rsi >= TradingRules.RSI_BULLISH
                 or rsi <= TradingRules.RSI_BEARISH
-            ):
-                score += TradingRules.RSI_SCORE
+            )
+        ):
+            score += TradingRules.RSI_SCORE
 
         if context.get("macd") is not None:
             score += TradingRules.MACD_SCORE
@@ -129,7 +133,9 @@ class OpportunityEngine:
         structure = context.get("market_structure")
 
         if structure in ("Bullish", "Bearish"):
-            return TradingRules.MARKET_STRUCTURE_GOOD_SCORE
+            return (
+                TradingRules.MARKET_STRUCTURE_GOOD_SCORE
+            )
 
         return TradingRules.MARKET_STRUCTURE_POOR_SCORE
 

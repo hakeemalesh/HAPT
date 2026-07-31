@@ -78,53 +78,69 @@ def main():
 
         logger.info("Analyzing %s", symbol)
 
-        price = data.get_price(symbol)
+        try:
 
-        if price is None:
-            logger.warning(
-                "No current price available for %s",
+            price = data.get_price(symbol)
+
+            if price is None:
+                logger.warning(
+                    "No current price available for %s",
+                    symbol,
+                )
+                continue
+
+            logger.info(
+                "Current price of %s: %s",
                 symbol,
+                price,
             )
-            continue
 
-        print(f"Current price of {symbol}: {price}")
+            market_context = pipeline.build_context(symbol)
 
-        market_context = pipeline.build_context(symbol)
+            if market_context is None:
+                logger.warning(
+                    "No historical data available for %s",
+                    symbol,
+                )
+                continue
 
-        if market_context is None:
-            logger.warning(
-                "No historical data available for %s",
+            strategy_result = strategy.analyze(
+                market_context,
+                price,
+            )
+
+            ai_result = ai.analyze(strategy_result)
+
+            #
+            # Execute Paper Trade
+            #
+            if ai_result.approved:
+
+                broker.place_order(
+                    symbol=ai_result.symbol,
+                    side=ai_result.signal,
+                    quantity=int(ai_result.position_size),
+                )
+
+            #
+            # Display
+            #
+            display.show(ai_result)
+
+            #
+            # Journal
+            #
+            journal.record_trade(ai_result)
+
+        except Exception as error:
+
+            logger.exception(
+                "Failed processing %s: %s",
                 symbol,
+                error,
             )
+
             continue
-
-        strategy_result = strategy.analyze(
-            market_context,
-            price,
-        )
-
-        ai_result = ai.analyze(strategy_result)
-
-        #
-        # Execute Paper Trade
-        #
-        if ai_result.approved:
-
-            broker.place_order(
-                symbol=ai_result.symbol,
-                side=ai_result.signal,
-                quantity=int(ai_result.position_size),
-            )
-
-        #
-        # Display
-        #
-        display.show(ai_result)
-
-        #
-        # Journal
-        #
-        journal.record_trade(ai_result)
 
     logger.info(
         "Recorded %d trades.",

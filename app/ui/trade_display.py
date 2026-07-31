@@ -5,11 +5,17 @@ HAPT Trade Display
 Displays trade information in a professional format.
 """
 
+from app.core.logger import setup_logger
 from app.models.trade import Trade
 
 
 class TradeDisplay:
     """Displays trading information."""
+
+    def __init__(self) -> None:
+        """Initialize the trade display."""
+
+        self.logger = setup_logger()
 
     def show(self, trade: Trade) -> None:
         """
@@ -83,3 +89,8 @@ class TradeDisplay:
                 print(f" • {note}")
 
         print("=" * 40)
+
+        self.logger.info(
+            "Displayed trade setup for %s.",
+            trade.symbol,
+        )

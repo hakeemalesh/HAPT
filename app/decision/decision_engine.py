@@ -42,6 +42,47 @@ class DecisionEngine:
         Evaluate market context.
         """
 
+        #
+        # ------------------------------------------
+        # Market Session Guard
+        # ------------------------------------------
+        #
+
+        if not context.get("market_open", False):
+
+            decision = Decision()
+
+            decision.symbol = context.get(
+                "symbol",
+                "",
+            )
+
+            decision.market = context.get(
+                "market",
+                "",
+            )
+
+            decision.score = 0
+
+            decision.confidence = 0.0
+
+            decision.grade = "D"
+
+            decision.signal = "WAIT"
+
+            decision.reasons = [
+                "Market is closed."
+            ]
+
+            decision.details = {
+                "session": context.get(
+                    "session",
+                    "Market Closed",
+                )
+            }
+
+            return decision
+
         score = 0
 
         details = {}
@@ -138,7 +179,7 @@ class DecisionEngine:
             reasons.append("MACD available")
         else:
             details["macd"] = "Unavailable"
-        
+
         # ------------------------------------------
         # ATR
         # ------------------------------------------

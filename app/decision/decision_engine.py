@@ -71,12 +71,34 @@ class DecisionEngine:
         # VWAP
         # ------------------------------------------
 
-        if context.get("vwap") is not None:
-            score += TradingRules.VWAP_SCORE
-            details["vwap"] = "Available"
-            reasons.append("VWAP available")
+        price = context.get("price")
+        vwap = context.get("vwap")
+
+        if price is not None and vwap is not None:
+
+            if price >= vwap:
+
+                score += TradingRules.VWAP_GOOD_SCORE
+
+                details["vwap"] = "Bullish"
+
+                reasons.append(
+                    "Price trading above VWAP"
+                )
+
+            else:
+
+                score += TradingRules.VWAP_POOR_SCORE
+
+                details["vwap"] = "Bearish"
+
+                reasons.append(
+                    "Price trading below VWAP"
+                )
+
         else:
-            details["vwap"] = "Unavailable"
+
+            details["vwap"] = "Unknown"
 
         # ------------------------------------------
         # RSI
@@ -116,6 +138,44 @@ class DecisionEngine:
             reasons.append("MACD available")
         else:
             details["macd"] = "Unavailable"
+        
+        # ------------------------------------------
+        # ATR
+        # ------------------------------------------
+
+        atr = context.get("atr")
+
+        if atr is not None:
+
+            if atr >= TradingRules.ATR_GOOD_THRESHOLD:
+
+                score += TradingRules.ATR_GOOD_SCORE
+
+                details["atr"] = "Good"
+
+                reasons.append(
+                    "ATR confirms healthy volatility"
+                )
+
+            elif atr >= TradingRules.ATR_FAIR_THRESHOLD:
+
+                score += TradingRules.ATR_FAIR_SCORE
+
+                details["atr"] = "Fair"
+
+                reasons.append(
+                    "ATR indicates moderate volatility"
+                )
+
+            else:
+
+                score += TradingRules.ATR_POOR_SCORE
+
+                details["atr"] = "Low"
+
+        else:
+
+            details["atr"] = "Unknown"
 
         # ------------------------------------------
         # Relative Volume
@@ -193,9 +253,9 @@ class DecisionEngine:
 
         decision.score = score
 
-        decision.confidence = min(
-            score,
-            100,
+        decision.confidence = round(
+            (score / self.max_score) * 100,
+            1,
         )
 
         decision.grade = grade

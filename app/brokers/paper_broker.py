@@ -5,12 +5,18 @@ HAPT Paper Broker
 Simulates a broker without risking real money.
 """
 
+from datetime import datetime
+
 from app.brokers.base_broker import BaseBroker
 from app.core.logger import setup_logger
+from app.models.trade import Trade
 
 
 class PaperBroker(BaseBroker):
     """Paper trading broker implementation."""
+
+    DEFAULT_COMMISSION = 1.00
+    DEFAULT_SLIPPAGE = 0.25
 
     def __init__(self) -> None:
         """Initialize the paper broker."""
@@ -43,12 +49,7 @@ class PaperBroker(BaseBroker):
         quantity: int,
     ) -> bool:
         """
-        Simulate placing a paper trade.
-
-        Returns
-        -------
-        bool
-            True if the simulated order was accepted.
+        Validate a simulated paper trade.
         """
 
         if not self.connected:
@@ -86,3 +87,25 @@ class PaperBroker(BaseBroker):
         )
 
         return True
+
+    def fill_trade(
+        self,
+        trade: Trade,
+    ) -> Trade:
+        """
+        Simulate a filled paper trade.
+        """
+
+        trade.entry_fill_price = trade.entry_price
+
+        trade.entry_time = datetime.now()
+
+        trade.commission = self.DEFAULT_COMMISSION
+
+        trade.slippage = self.DEFAULT_SLIPPAGE
+
+        trade.notes.append(
+            "Paper Broker simulated trade fill."
+        )
+
+        return trade

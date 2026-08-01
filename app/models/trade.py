@@ -2,20 +2,29 @@
 HAPT Trade Model
 ----------------
 
-Represents the final trade plan produced
-by the Trade Planner.
+Represents the complete lifecycle of a trade,
+from planning through execution and closure.
 """
 
 from dataclasses import dataclass, field
 from datetime import datetime
+import uuid
 
 
 @dataclass
 class Trade:
     """
-    Represents a complete trade plan ready for
-    journaling or execution.
+    Represents a complete trade throughout
+    its lifecycle.
     """
+
+    # ----------------------------------
+    # Trade Identity
+    # ----------------------------------
+
+    trade_id: str = field(
+        default_factory=lambda: str(uuid.uuid4())[:8]
+    )
 
     symbol: str = ""
 
@@ -34,7 +43,7 @@ class Trade:
     confidence: float = 0.0
 
     # ----------------------------------
-    # Trade Prices
+    # Planned Prices
     # ----------------------------------
 
     entry_price: float = 0.0
@@ -42,6 +51,14 @@ class Trade:
     stop_loss: float = 0.0
 
     target_price: float = 0.0
+
+    # ----------------------------------
+    # Executed Prices
+    # ----------------------------------
+
+    entry_fill_price: float = 0.0
+
+    exit_fill_price: float = 0.0
 
     # ----------------------------------
     # Position
@@ -54,6 +71,28 @@ class Trade:
     risk_reward: float = 0.0
 
     # ----------------------------------
+    # Profit & Loss
+    # ----------------------------------
+
+    profit_loss: float = 0.0
+
+    commission: float = 0.0
+
+    slippage: float = 0.0
+
+    # ----------------------------------
+    # Trade Timing
+    # ----------------------------------
+
+    created_at: datetime = field(
+        default_factory=datetime.now
+    )
+
+    entry_time: datetime | None = None
+
+    exit_time: datetime | None = None
+
+    # ----------------------------------
     # Status
     # ----------------------------------
 
@@ -61,9 +100,9 @@ class Trade:
 
     status: str = "PENDING"
 
-    created_at: datetime = field(
-        default_factory=datetime.now
-    )
+    # ----------------------------------
+    # Notes
+    # ----------------------------------
 
     notes: list[str] = field(
         default_factory=list

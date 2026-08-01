@@ -42,7 +42,7 @@ class AccountState:
         new_balance: float,
     ):
         """
-        Update the current account balance.
+        Update the account balance.
         """
 
         self.current_balance = new_balance
@@ -62,31 +62,53 @@ class AccountState:
             self.daily_profit = 0.0
             self.daily_loss = abs(pnl)
 
-    def record_win(self):
+    def process_trade(
+        self,
+        profit_loss: float,
+    ):
         """
-        Record a winning trade.
-        """
-
-        self.winning_trades += 1
-
-    def record_loss(self):
-        """
-        Record a losing trade.
+        Update the account after
+        a completed trade.
         """
 
-        self.losing_trades += 1
+        #
+        # Update balance
+        #
 
-    def increment_open_trades(self):
+        self.update_balance(
+            self.current_balance + profit_loss
+        )
+
+        #
+        # Update statistics
+        #
+
+        if profit_loss >= 0:
+
+            self.winning_trades += 1
+
+        else:
+
+            self.losing_trades += 1
+
+            self.drawdown += abs(
+                profit_loss
+            )
+
+        #
+        # Close one trade
+        #
+
+        if self.open_trades > 0:
+
+            self.open_trades -= 1
+
+    def increment_open_trades(
+        self,
+    ):
         """
-        Increase the number of open trades.
+        Increase the number of
+        open trades.
         """
 
         self.open_trades += 1
-
-    def decrement_open_trades(self):
-        """
-        Decrease the number of open trades.
-        """
-
-        if self.open_trades > 0:
-            self.open_trades -= 1

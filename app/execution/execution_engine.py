@@ -19,9 +19,7 @@ class ExecutionEngine:
         broker=None,
         account=None,
     ):
-        """
-        Initialize the execution engine.
-        """
+        """Initialize the execution engine."""
 
         self.broker = broker or PaperBroker()
         self.account = account or AccountManager()
@@ -34,9 +32,6 @@ class ExecutionEngine:
         Execute a trade.
         """
 
-        #
-        # Reject unapproved trades
-        #
         if not trade.approved:
 
             trade.status = "REJECTED"
@@ -47,18 +42,12 @@ class ExecutionEngine:
 
             return trade
 
-        #
-        # Send order to broker
-        #
         order_success = self.broker.place_order(
             symbol=trade.symbol,
             side=trade.signal,
             quantity=int(trade.position_size),
         )
 
-        #
-        # Update trade status
-        #
         if order_success:
 
             trade.status = "EXECUTED"
@@ -70,6 +59,7 @@ class ExecutionEngine:
             #
             # Update live account state
             #
+
             state = self.account.get_state()
 
             state.increment_open_trades()
@@ -83,5 +73,27 @@ class ExecutionEngine:
             trade.notes.append(
                 "Broker rejected paper trade."
             )
+
+        return trade
+
+    def close_trade(
+        self,
+        trade: Trade,
+        profit_loss: float,
+    ) -> Trade:
+        """
+        Close a trade and update
+        the account statistics.
+        """
+
+        state = self.account.get_state()
+
+        state.process_trade(profit_loss)
+
+        trade.status = "CLOSED"
+
+        trade.notes.append(
+            f"Trade closed with P/L: ${profit_loss:.2f}"
+        )
 
         return trade

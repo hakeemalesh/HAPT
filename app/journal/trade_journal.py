@@ -12,37 +12,48 @@ class TradeJournal:
     """Stores completed HAPT trades."""
 
     def __init__(self):
+        """Initialize the trade journal."""
+
         self._trades = []
 
-    def add_trade(self, trade: Trade) -> None:
+    def add_trade(
+        self,
+        trade: Trade,
+    ) -> None:
         """
         Add a completed trade.
         """
 
         if not isinstance(trade, Trade):
+
             raise TypeError(
                 "trade must be a Trade instance."
             )
 
         self._trades.append(trade)
 
-    def record_trade(self, trade: Trade) -> None:
+    def record_trade(
+        self,
+        trade: Trade,
+    ) -> None:
         """
-        Backwards-compatible alias for add_trade().
+        Backwards-compatible alias.
         """
 
         self.add_trade(trade)
 
     def get_trades(self) -> list[Trade]:
         """
-        Return a copy of all recorded trades.
+        Return all recorded trades.
         """
 
         return list(self._trades)
 
-    def get_latest_trade(self) -> Trade | None:
+    def get_latest_trade(
+        self,
+    ) -> Trade | None:
         """
-        Return the most recently recorded trade.
+        Return the most recent trade.
         """
 
         if not self._trades:
@@ -52,10 +63,73 @@ class TradeJournal:
 
     def count(self) -> int:
         """
-        Return the number of recorded trades.
+        Return number of recorded trades.
         """
 
         return len(self._trades)
+
+    def winning_trades(self) -> int:
+        """
+        Return the number of winning trades.
+        """
+
+        return sum(
+            1
+            for trade in self._trades
+            if trade.profit_loss > 0
+        )
+
+    def losing_trades(self) -> int:
+        """
+        Return the number of losing trades.
+        """
+
+        return sum(
+            1
+            for trade in self._trades
+            if trade.profit_loss < 0
+        )
+
+    def total_profit(self) -> float:
+        """
+        Return total realized profit.
+        """
+
+        return round(
+            sum(
+                trade.profit_loss
+                for trade in self._trades
+                if trade.profit_loss > 0
+            ),
+            2,
+        )
+
+    def total_loss(self) -> float:
+        """
+        Return total realized loss.
+        """
+
+        return round(
+            sum(
+                trade.profit_loss
+                for trade in self._trades
+                if trade.profit_loss < 0
+            ),
+            2,
+        )
+
+    def net_profit(self) -> float:
+        """
+        Return overall net profit.
+        """
+
+        return round(
+            sum(
+                trade.profit_loss
+                for trade in self._trades
+            ),
+            2,
+        )
 
     def clear(self) -> None:
         """

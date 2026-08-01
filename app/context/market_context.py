@@ -16,7 +16,12 @@ class MarketContext:
 
         self.session_manager = MarketSessionManager(market)
 
-    def build(self, symbol, indicators):
+    def build(
+        self,
+        symbol,
+        indicators,
+        price,
+    ):
         """
         Build the current market context.
 
@@ -25,6 +30,8 @@ class MarketContext:
         symbol : str
 
         indicators : dict
+
+        price : float
 
         Returns
         -------
@@ -39,6 +46,11 @@ class MarketContext:
         if not indicators:
             raise ValueError(
                 "Indicators cannot be empty."
+            )
+
+        if price is None:
+            raise ValueError(
+                "Price cannot be None."
             )
 
         session = self.session_manager.get_market_context()
@@ -56,6 +68,7 @@ class MarketContext:
 
             # Instrument
             "symbol": symbol,
+            "price": price,
 
             # Market Information
             "market": session.get("market"),

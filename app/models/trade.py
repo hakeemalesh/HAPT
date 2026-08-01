@@ -25,11 +25,27 @@ class Trade:
 
     grade: str = "D"
 
+    # ----------------------------------
+    # Decision Engine Results
+    # ----------------------------------
+
+    score: int = 0
+
+    confidence: float = 0.0
+
+    # ----------------------------------
+    # Trade Prices
+    # ----------------------------------
+
     entry_price: float = 0.0
 
     stop_loss: float = 0.0
 
     target_price: float = 0.0
+
+    # ----------------------------------
+    # Position
+    # ----------------------------------
 
     position_size: float = 0.0
 
@@ -37,10 +53,18 @@ class Trade:
 
     risk_reward: float = 0.0
 
+    # ----------------------------------
+    # Status
+    # ----------------------------------
+
     approved: bool = False
 
     status: str = "PENDING"
 
-    created_at: datetime = field(default_factory=datetime.now)
+    created_at: datetime = field(
+        default_factory=datetime.now
+    )
 
-    notes: list[str] = field(default_factory=list)
+    notes: list[str] = field(
+        default_factory=list
+    )

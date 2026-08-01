@@ -22,13 +22,19 @@ class DataPipeline:
         self.market_context = MarketContext()
         self.opportunity_engine = OpportunityEngine()
 
-    def build_context(self, symbol):
+    def build_context(
+        self,
+        symbol,
+        price,
+    ):
         """
         Build a complete market context.
 
         Parameters
         ----------
         symbol : str
+
+        price : float
 
         Returns
         -------
@@ -57,6 +63,7 @@ class DataPipeline:
 
         market_context = self.market_context.build(
             symbol=symbol,
+            price=price,
             indicators=indicators,
         )
 

@@ -74,7 +74,9 @@ class StrategyEngine:
         trade.market = decision.market
         trade.signal = decision.signal
         trade.grade = decision.grade
-
+        trade.score = decision.score
+        trade.confidence = decision.confidence
+        
         #
         # No trade if decision is WAIT
         #
@@ -82,7 +84,7 @@ class StrategyEngine:
 
             trade.approved = False
             trade.status = "REJECTED"
-            trade.notes = decision.reasons
+            trade.notes = list(decision.reasons)
 
             return trade
 
@@ -100,9 +102,10 @@ class StrategyEngine:
 
             target_price = (
                 self.contract_calculator.calculate_take_profit(
-                    entry_price,
-                    stop_distance,
-                    self.DEFAULT_RISK_REWARD,
+                    entry_price=entry_price,
+                    stop_distance=stop_distance,
+                    signal="BUY",
+                    risk_reward=self.DEFAULT_RISK_REWARD,
                 )
             )
 
@@ -114,10 +117,11 @@ class StrategyEngine:
             )
 
             target_price = (
-                entry_price
-                - (
-                    stop_distance
-                    * self.DEFAULT_RISK_REWARD
+                self.contract_calculator.calculate_take_profit(
+                    entry_price=entry_price,
+                    stop_distance=stop_distance,
+                    signal="SELL",
+                    risk_reward=self.DEFAULT_RISK_REWARD,
                 )
             )
 

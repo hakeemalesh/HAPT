@@ -6,6 +6,7 @@ Calculates position sizes while enforcing
 HAPT business rules.
 """
 
+from app.account.account_manager import AccountManager
 from app.calculator.contract_calculator import ContractCalculator
 from app.instruments.instrument_manager import InstrumentManager
 from app.position_sizing.models import PositionSizingResult
@@ -19,6 +20,7 @@ class PositionSizingEngine:
     def __init__(self):
         self.instrument_manager = InstrumentManager()
         self.contract_calculator = ContractCalculator()
+        self.account = AccountManager()
 
     def calculate(
         self,
@@ -83,6 +85,10 @@ class PositionSizingEngine:
             )
         )
 
+        #
+        # Must be able to trade at least one contract
+        #
+
         if contracts < 1:
             return PositionSizingResult(
                 valid=False,
@@ -94,6 +100,53 @@ class PositionSizingEngine:
                 remaining_risk=account_risk,
                 warnings=[
                     "Risk is too small to open one contract."
+                ],
+            )
+
+        #
+        # Instrument contract limit
+        #
+
+        max_contracts = (
+            self.instrument_manager.get_max_contracts(
+                symbol
+            )
+        )
+
+        if (
+            max_contracts is not None
+            and contracts > max_contracts
+        ):
+            contracts = max_contracts
+
+        #
+        # Buying power check
+        #
+
+        day_margin = (
+            self.instrument_manager.get_day_margin(
+                symbol
+            )
+        )
+
+        buying_power = (
+            self.account.get_buying_power()
+        )
+
+        required_margin = contracts * day_margin
+
+        if required_margin > buying_power:
+
+            return PositionSizingResult(
+                valid=False,
+                symbol=symbol,
+                asset_type=asset_type,
+                contracts=0,
+                risk_per_contract=risk_per_contract,
+                total_risk=0.0,
+                remaining_risk=account_risk,
+                warnings=[
+                    "Insufficient buying power."
                 ],
             )
 

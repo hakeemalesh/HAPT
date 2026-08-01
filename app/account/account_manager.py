@@ -44,6 +44,13 @@ class AccountManager:
 
         return self.state.current_balance
 
+    def get_buying_power(self):
+        """
+        Return available buying power.
+        """
+
+        return self.state.buying_power
+
     def get_risk_percent(self):
         """Return risk percentage."""
 

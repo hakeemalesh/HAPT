@@ -2,9 +2,11 @@
 HAPT Execution Engine
 ---------------------
 
-Executes approved trades using the configured broker.
+Executes approved trades using the configured broker
+and updates the live account state.
 """
 
+from app.account.account_manager import AccountManager
 from app.brokers.paper_broker import PaperBroker
 from app.models.trade import Trade
 
@@ -12,17 +14,17 @@ from app.models.trade import Trade
 class ExecutionEngine:
     """Executes approved HAPT trades."""
 
-    def __init__(self, broker: PaperBroker):
+    def __init__(
+        self,
+        broker=None,
+        account=None,
+    ):
         """
         Initialize the execution engine.
-
-        Parameters
-        ----------
-        broker : PaperBroker
-            Connected broker instance.
         """
 
-        self.broker = broker
+        self.broker = broker or PaperBroker()
+        self.account = account or AccountManager()
 
     def execute(
         self,
@@ -30,14 +32,6 @@ class ExecutionEngine:
     ) -> Trade:
         """
         Execute a trade.
-
-        Parameters
-        ----------
-        trade : Trade
-
-        Returns
-        -------
-        Trade
         """
 
         #
@@ -73,9 +67,17 @@ class ExecutionEngine:
                 "Paper trade executed successfully."
             )
 
+            #
+            # Update live account state
+            #
+            state = self.account.get_state()
+
+            state.increment_open_trades()
+
         else:
 
             trade.status = "FAILED"
+
             trade.approved = False
 
             trade.notes.append(

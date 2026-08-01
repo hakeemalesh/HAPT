@@ -6,22 +6,30 @@ Manages trading account information and
 calculates allowable trade risk.
 """
 
+from app.config.trading_account import (
+    ACCOUNT_BALANCE,
+    RISK_PERCENT,
+    ACCOUNT_CURRENCY,
+    ACCOUNT_NAME,
+)
+
 
 class AccountManager:
     """Manages account settings."""
 
-    DEFAULT_BALANCE = 3000.00
-    DEFAULT_RISK_PERCENT = 1.0
-
     def __init__(
         self,
-        balance=DEFAULT_BALANCE,
-        risk_percent=DEFAULT_RISK_PERCENT,
+        balance=ACCOUNT_BALANCE,
+        risk_percent=RISK_PERCENT,
+        currency=ACCOUNT_CURRENCY,
+        account_name=ACCOUNT_NAME,
     ):
         """Initialize account settings."""
 
         self.balance = balance
         self.risk_percent = risk_percent
+        self.currency = currency
+        self.account_name = account_name
 
     def get_balance(self):
         """Return account balance."""
@@ -32,6 +40,16 @@ class AccountManager:
         """Return risk percentage."""
 
         return self.risk_percent
+
+    def get_currency(self):
+        """Return account currency."""
+
+        return self.currency
+
+    def get_account_name(self):
+        """Return account name."""
+
+        return self.account_name
 
     def get_max_trade_risk(self):
         """
@@ -60,3 +78,19 @@ class AccountManager:
         """Update risk percentage."""
 
         self.risk_percent = risk_percent
+
+    def update_currency(
+        self,
+        currency,
+    ):
+        """Update account currency."""
+
+        self.currency = currency
+
+    def update_account_name(
+        self,
+        account_name,
+    ):
+        """Update account name."""
+
+        self.account_name = account_name

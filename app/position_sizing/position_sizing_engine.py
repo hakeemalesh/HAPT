@@ -6,8 +6,6 @@ Calculates position sizes while enforcing
 HAPT business rules.
 """
 
-from math import floor
-
 from app.calculator.contract_calculator import ContractCalculator
 from app.instruments.instrument_manager import InstrumentManager
 from app.position_sizing.models import PositionSizingResult
@@ -26,7 +24,7 @@ class PositionSizingEngine:
         self,
         symbol: str,
         account_risk: float,
-        stop_distance: float
+        stop_distance: float,
     ) -> PositionSizingResult:
         """
         Calculate the allowable position size.
@@ -41,24 +39,49 @@ class PositionSizingEngine:
                 risk_per_contract=0.0,
                 total_risk=0.0,
                 remaining_risk=account_risk,
-                warnings=["Unsupported trading instrument."]
+                warnings=[
+                    "Unsupported trading instrument."
+                ],
             )
 
-        asset_type = self.instrument_manager.get_asset_type(symbol)
-        dollar_per_point = self.instrument_manager.get_dollar_per_point(symbol)
-
-        risk_per_contract = self.contract_calculator.calculate_risk_amount(
-            stop_distance,
-            dollar_per_point
+        asset_type = self.instrument_manager.get_asset_type(
+            symbol
         )
 
-        raw_position_size = self.contract_calculator.calculate_position_size(
-            account_risk,
-            stop_distance,
-            dollar_per_point
+        dollar_per_point = (
+            self.contract_calculator.get_contract_value(
+                symbol
+            )
         )
 
-        contracts = floor(raw_position_size)
+        if dollar_per_point is None:
+            return PositionSizingResult(
+                valid=False,
+                symbol=symbol,
+                asset_type=asset_type,
+                contracts=0,
+                risk_per_contract=0.0,
+                total_risk=0.0,
+                remaining_risk=account_risk,
+                warnings=[
+                    "Contract value unavailable."
+                ],
+            )
+
+        risk_per_contract = (
+            self.contract_calculator.calculate_risk_amount(
+                stop_distance,
+                dollar_per_point,
+            )
+        )
+
+        contracts = (
+            self.contract_calculator.calculate_position_size(
+                symbol,
+                account_risk,
+                stop_distance,
+            )
+        )
 
         if contracts < 1:
             return PositionSizingResult(
@@ -71,11 +94,15 @@ class PositionSizingEngine:
                 remaining_risk=account_risk,
                 warnings=[
                     "Risk is too small to open one contract."
-                ]
+                ],
             )
 
         total_risk = contracts * risk_per_contract
-        remaining_risk = account_risk - total_risk
+
+        remaining_risk = round(
+            account_risk - total_risk,
+            2,
+        )
 
         return PositionSizingResult(
             valid=True,
@@ -85,5 +112,5 @@ class PositionSizingEngine:
             risk_per_contract=risk_per_contract,
             total_risk=total_risk,
             remaining_risk=remaining_risk,
-            warnings=[]
+            warnings=[],
         )

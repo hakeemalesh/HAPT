@@ -3,9 +3,10 @@ HAPT Account Manager
 --------------------
 
 Manages trading account information and
-calculates allowable trade risk.
+maintains the live account state.
 """
 
+from app.account_state.account_state import AccountState
 from app.config.trading_account import (
     ACCOUNT_BALANCE,
     RISK_PERCENT,
@@ -15,7 +16,7 @@ from app.config.trading_account import (
 
 
 class AccountManager:
-    """Manages account settings."""
+    """Manages account settings and live account state."""
 
     def __init__(
         self,
@@ -31,10 +32,17 @@ class AccountManager:
         self.currency = currency
         self.account_name = account_name
 
+        self.state = AccountState(
+            starting_balance=balance,
+            current_balance=balance,
+            buying_power=balance,
+            available_margin=balance,
+        )
+
     def get_balance(self):
         """Return account balance."""
 
-        return self.balance
+        return self.state.current_balance
 
     def get_risk_percent(self):
         """Return risk percentage."""
@@ -53,23 +61,28 @@ class AccountManager:
 
     def get_max_trade_risk(self):
         """
-        Return maximum dollar risk
-        allowed for one trade.
+        Return maximum allowable dollar
+        risk for one trade.
         """
 
         return round(
-            self.balance
+            self.get_balance()
             * (self.risk_percent / 100),
             2,
         )
 
+    def get_state(self):
+        """Return the live account state."""
+
+        return self.state
+
     def update_balance(
         self,
-        balance,
+        new_balance,
     ):
         """Update account balance."""
 
-        self.balance = balance
+        self.state.update_balance(new_balance)
 
     def update_risk_percent(
         self,

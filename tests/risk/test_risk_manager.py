@@ -26,7 +26,7 @@ def test_approved_trade():
     assert risk.position_size == 1.2
     assert risk.risk_reward == 2.0
     assert risk.risk_amount == 30.0
-    assert "Trade satisfies HAPT risk rules." in risk.notes
+    assert "Trade approved by HAPT Risk Manager." in risk.notes
 
 
 def test_rejected_trade_due_to_grade():
@@ -46,7 +46,7 @@ def test_rejected_trade_due_to_grade():
     )
 
     assert risk.approved is False
-    assert "Trade rejected by HAPT risk rules." in risk.notes
+    assert "Trade rejected by HAPT Risk Manager." in risk.notes
 
 
 def test_rejected_trade_due_to_risk_reward():

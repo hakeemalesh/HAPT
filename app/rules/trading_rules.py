@@ -79,10 +79,14 @@ class TradingRules:
     # Grades
     # ----------------------------------
 
-    GRADE_A_PLUS = 95
-    GRADE_A = 90
-    GRADE_B = 80
-    GRADE_C = 70
+    # Calibrated after Strategy Engine v1
+    # to reflect realistic high-quality
+    # futures trading opportunities.
+
+    GRADE_A_PLUS = 90
+    GRADE_A = 80
+    GRADE_B = 65
+    GRADE_C = 50
 
     # ----------------------------------
     # Maximum Score

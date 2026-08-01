@@ -68,6 +68,24 @@ class InstrumentManager:
                 "tick_value": 5.00,
                 "dollar_per_point": 20.00
             },
+           
+            "RTY": {
+                "name": "E-mini Russell 2000",
+                "asset_type": "Future",
+                "exchange": "CME",
+                "tick_size": 0.10,
+                "tick_value": 5.00,
+                "dollar_per_point": 50.00
+            },
+
+            "YM": {
+                "name": "E-mini Dow",
+                "asset_type": "Future",
+                "exchange": "CBOT",
+                "tick_size": 1.00,
+                "tick_value": 5.00,
+                "dollar_per_point": 5.00
+            },
 
             "GC": {
                 "name": "Gold Futures",

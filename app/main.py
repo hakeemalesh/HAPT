@@ -20,6 +20,7 @@ from app.pipeline.data_pipeline import DataPipeline
 
 from app.brokers.paper_broker import PaperBroker
 from app.ui.trade_display import TradeDisplay
+from app.execution.execution_engine import ExecutionEngine
 
 
 def main():
@@ -43,6 +44,7 @@ def main():
     data = MarketData()
     pipeline = DataPipeline()
     broker = PaperBroker()
+    execution = ExecutionEngine(broker)
     display = TradeDisplay()
 
     # --------------------------------------------------
@@ -95,7 +97,14 @@ def main():
                 price,
             )
 
-            market_context = pipeline.build_context(symbol)
+            # --------------------------------------------------
+            # Build Market Context
+            # --------------------------------------------------
+
+            market_context = pipeline.build_context(
+                symbol,
+                price,
+            )
 
             if market_context is None:
                 logger.warning(
@@ -104,32 +113,42 @@ def main():
                 )
                 continue
 
+            # --------------------------------------------------
+            # Strategy Engine
+            # --------------------------------------------------
+
             strategy_result = strategy.analyze(
                 market_context,
                 price,
             )
 
+            # --------------------------------------------------
+            # AI Validation
+            # --------------------------------------------------
+
             ai_result = ai.analyze(strategy_result)
 
             #
-            # Execute Paper Trade
+            # Execute Trade
             #
-            if ai_result.approved:
+            ai_result = execution.execute(ai_result)
 
-                broker.place_order(
-                    symbol=ai_result.symbol,
-                    side=ai_result.signal,
-                    quantity=int(ai_result.position_size),
-                )
+            logger.info(
+                "Trade status for %s: %s",
+                ai_result.symbol,
+                ai_result.status,
+            )
 
-            #
-            # Display
-            #
+            # --------------------------------------------------
+            # Display Trade
+            # --------------------------------------------------
+
             display.show(ai_result)
 
-            #
-            # Journal
-            #
+            # --------------------------------------------------
+            # Record Trade
+            # --------------------------------------------------
+
             journal.record_trade(ai_result)
 
         except Exception as error:

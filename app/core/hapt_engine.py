@@ -80,10 +80,16 @@ class HAPTEngine:
         )
 
         #
-        # Remaining orchestration
-        # will be migrated here
+        # Scan market
         #
-        pass
+        self.scanner.load_symbols(symbols)
+
+        self.scanner.scan()
+
+        #
+        # Return symbols for further processing
+        #
+        return symbols
 
     finally:
 

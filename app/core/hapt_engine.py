@@ -55,10 +55,29 @@ class HAPTEngine:
         self.display = TradeDisplay()
 
     def run(self):
-        """
-        Execute one complete HAPT cycle.
-        """
+    """
+    Execute one complete HAPT cycle.
+    """
 
-        raise NotImplementedError(
-            "HAPTEngine.run() not implemented yet."
+    self.logger.info(
+        "Starting HAPT Engine."
+    )
+
+    self.broker.connect()
+
+    try:
+
+        #
+        # Remaining orchestration
+        # will be migrated here
+        # in future sprints.
+        #
+        pass
+
+    finally:
+
+        self.broker.disconnect()
+
+        self.logger.info(
+            "HAPT Engine finished."
         )

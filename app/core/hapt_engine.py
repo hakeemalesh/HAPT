@@ -68,9 +68,20 @@ class HAPTEngine:
     try:
 
         #
+        # Load watchlist
+        #
+        self.market.load_default_watchlist()
+
+        symbols = self.market.get_symbols()
+
+        self.logger.info(
+            "Loaded %d trading instruments.",
+            len(symbols),
+        )
+
+        #
         # Remaining orchestration
         # will be migrated here
-        # in future sprints.
         #
         pass
 

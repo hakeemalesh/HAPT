@@ -197,18 +197,11 @@ class HAPTEngine:
                 return
 
             #
-            # Strategy Analysis
-            #
-            strategy_result = self.strategy.analyze(
-                market_context,
-                price,
-            )
-
-            #
             # Build Trade Plan
             #
             trade = self.trade_planner.create_trade_plan(
-                strategy_result
+                market_context,
+                price,
             )
 
             #

@@ -44,3 +44,22 @@ data/live/*.csv
 # Keep the cache directories
 !data/historical/.gitkeep
 !data/live/.gitkeep
+
+# Python bytecode
+*.pyo
+*.pyd
+
+# Type checking
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local development folders
+backups/
+generated/
+production/
+production_review/
+review_files/
+review_files_2/
+review_main/

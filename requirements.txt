@@ -1,0 +1,9 @@
+# HAPT Version 1.0 Runtime Dependencies
+
+numpy==2.5.1
+pandas==3.0.3
+requests==2.34.2
+PyYAML==6.0.3
+python-dotenv==1.2.2
+rich==15.0.0
+yfinance==1.5.2

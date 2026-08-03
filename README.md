@@ -1,219 +1,225 @@
-# HAPT (Hakeem's Advanced Python Trading Toolkit)
+# HAPT – Hybrid AI Trading Platform
 
-> A modular Python toolkit for quantitative trading, technical analysis, and algorithmic trading research.
-
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Status](https://img.shields.io/badge/Status-Active-success.svg)
+**Version:** 1.0 Release Candidate  
+**Author:** Hakeem Alesh
 
 ---
 
 # Overview
 
-HAPT is an open-source Python project designed to help traders, investors, and developers build professional trading systems.
+HAPT (Hybrid AI Trading Platform) is a modular algorithmic trading platform designed with a strong emphasis on simplicity, reliability, scalability, and maintainability.
 
-The project focuses on:
+The platform combines market scanning, technical analysis, risk management, trade planning, AI-assisted decision support, execution, and journaling into a clean production architecture.
 
-- Technical Indicators
-- Market Analysis
-- Trading Strategies
-- Risk Management
-- Portfolio Analytics
-- Algorithmic Trading
-- Backtesting
-- Future Live Trading Integration
+HAPT has been developed using disciplined software engineering practices including modular design, automated testing, incremental integration, and version-controlled development.
 
-HAPT is being developed incrementally, with every stable version fully tested and version-controlled.
+---
+
+# Core Design Principles
+
+- Simplicity before complexity
+- Reliability before features
+- Modular architecture
+- Clean separation of responsibilities
+- Scalable design
+- Test-driven development
+- Production-ready engineering
 
 ---
 
 # Current Features
 
-Currently implemented:
+## Market Management
 
-- Exponential Moving Average (EMA)
-- Average True Range (ATR)
-- Moving Average Convergence Divergence (MACD)
-
-More indicators will be added in future releases.
+- Market session management
+- Watchlist management
+- Instrument management
 
 ---
 
-# Project Structure
+## Data Pipeline
+
+- Historical market data
+- Live market data interface
+- Market context generation
+- Data processing pipeline
+
+---
+
+## Technical Indicators
+
+- EMA
+- VWAP
+- RSI
+- MACD
+- ATR
+- Volume Analysis
+
+---
+
+## Trading Intelligence
+
+- Market Scanner
+- Strategy Engine
+- Trade Planner
+- Trade Validator
+- AI Decision Engine
+
+---
+
+## Risk Management
+
+- Position sizing
+- Risk Manager
+- Account management
+
+---
+
+## Trade Execution
+
+- Paper Broker
+- Execution Engine
+- Trade Display
+- Trade Journal
+
+---
+
+## Analytics
+
+- Performance Analyzer
+- Backtesting Engine
+
+---
+
+# Architecture
 
 ```
-HAPT/
-│
-├── app/
-│   ├── indicators/
-│   ├── tests/
-│   ├── utils/
-│   └── main.py
-│
-├── docs/
-│
-├── requirements.txt
-├── pytest.ini
-├── README.md
-└── LICENSE
+main.py
+    │
+    ▼
+HAPTEngine
+    │
+    ├── Market Manager
+    ├── Data Pipeline
+    ├── Market Scanner
+    ├── Trade Planner
+    ├── Trade Validator
+    ├── AI Engine
+    ├── Execution Engine
+    ├── Trade Journal
+    └── User Interface
+```
+
+Every module has a single responsibility.
+
+---
+
+# Repository Structure
+
+```
+app/
+tests/
+config/
+data/
+docs/
+docker/
+scripts/
 ```
 
 ---
 
-# Installation
+# Testing
 
-Clone the repository:
+Current automated test status:
 
-```bash
-git clone https://github.com/hakeemalesh/HAPT.git
-```
+- 106 unit tests
+- All tests passing
 
-Enter the project:
-
-```bash
-cd HAPT
-```
-
-Create a virtual environment:
-
-```bash
-python -m venv .venv
-```
-
-Activate it.
-
-Linux / WSL:
-
-```bash
-source .venv/bin/activate
-```
-
-Windows:
-
-```powershell
-.venv\Scripts\activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# Running the Project
-
-Run the application:
-
-```bash
-python app/main.py
-```
-
----
-
-# Running Tests
-
-Execute all tests:
+Run tests:
 
 ```bash
 pytest
 ```
 
-At the time of Version 1.0:
+---
 
-- 26 tests passed successfully.
+# Running HAPT
+
+Activate the virtual environment:
+
+```bash
+source .venv/bin/activate
+```
+
+Run the application:
+
+```bash
+python -m app.main
+```
 
 ---
 
-# Development Roadmap
+# Development Workflow
+
+Each engineering task follows the HAPT Engineering Standard:
+
+1. Review
+2. Design
+3. Implement
+4. Compile
+5. Test
+6. Run
+7. Commit
+
+---
+
+# Current Status
+
+Version 1.0 Release Candidate
+
+Completed:
+
+- Modular Architecture
+- HAPTEngine
+- Production Launcher
+- Paper Trading
+- Risk Management
+- AI Review
+- Trade Validation
+- Trade Journaling
+- Automated Testing
+- End-to-End Integration
+
+---
+
+# Roadmap
 
 ## Version 1.1
 
-- Professional documentation
-- Improved project structure
-- Better packaging
-- Code quality improvements
+- Live market data
+- Broker integrations
+- Telegram notifications
+- Portfolio analytics
 
-## Version 1.2
+## Version 2.0
 
-- Additional technical indicators
-- Trading signal engine
-- Strategy framework
-
-## Version 1.3
-
-- Historical market data support
-- Backtesting engine
-- Position sizing
-
-## Future Versions
-
-- Portfolio management
-- Paper trading
-- Live broker integration
-- Web dashboard
-- Desktop application
-
----
-
-# Technologies
-
-- Python
-- Pytest
-- Git
-- GitHub
-
-Future:
-
-- Pandas
-- NumPy
-- Matplotlib
-- Plotly
-- FastAPI
-
----
-
-# Contributing
-
-Contributions, ideas, bug reports, and feature requests are welcome.
-
-Future contribution guidelines will be provided in the CONTRIBUTING.md document.
+- Advanced AI models
+- Multi-broker support
+- Strategy optimisation
+- Professional dashboard
 
 ---
 
 # License
 
-This project is licensed under the MIT License.
+See the LICENSE file.
 
 ---
 
 # Author
 
-**Hakeem Alesh**
+Hakeem Alesh
 
-GitHub:
+Hybrid AI Trading Platform (HAPT)
 
-https://github.com/hakeemalesh
-
----
-
-# Project Status
-
-Current Version:
-
-**HAPT v1.0**
-
-Current Branch:
-
-**master**
-
-Current Status:
-
-Stable
-
----
-
-Thank you for visiting the HAPT project.
-
-More professional trading features are coming soon.
+Version 1.0 Release Candidate

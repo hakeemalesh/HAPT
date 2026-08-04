@@ -2,104 +2,210 @@
 HAPT Market Data
 ----------------
 
-Central access point for market data.
+Central gateway for all HAPT market data.
 
-This module coordinates:
-- Data Provider
-- Historical Data
-- Demo Historical Data
+Responsibilities
+----------------
+- Live market prices
+- Historical market data
+- Provider management
+- Historical data storage
 
-Other HAPT modules should interact with this class rather
-than individual data sources.
+This class isolates the rest of HAPT from
+individual market data providers.
 """
 
-
-from app.datafeed.demo_historical_data import DemoHistoricalData
-from app.datafeed.providers.provider_factory import ProviderFactory
-from app.datafeed.historical_data import HistoricalData
+from app.datafeed.demo_historical_data import (
+    DemoHistoricalData,
+)
+from app.datafeed.yahoo_historical_data import (
+    YahooHistoricalData,
+)
+from app.datafeed.historical_data import (
+    HistoricalData,
+)
+from app.datafeed.providers.provider_factory import (
+    ProviderFactory,
+)
 
 
 class MarketData:
-    """Provides access to market data."""
+    """
+    Central market data interface used by HAPT.
+    """
+
+    #
+    # Internal HAPT → Yahoo symbol mapping
+    #
+    YAHOO_SYMBOLS = {
+        "MES": "MES=F",
+        "MNQ": "MNQ=F",
+        "M2K": "M2K=F",
+        "MYM": "MYM=F",
+        "ES": "ES=F",
+        "NQ": "NQ=F",
+        "RTY": "RTY=F",
+        "YM": "YM=F",
+        "CL": "CL=F",
+        "GC": "GC=F",
+    }
+
+    DEFAULT_SYMBOLS = [
+        "MES",
+        "MNQ",
+        "M2K",
+        "MYM",
+        "ES",
+        "NQ",
+        "RTY",
+        "YM",
+        "CL",
+        "GC",
+    ]
 
     def __init__(self, provider="demo"):
-        """Initialize the market data system."""
+        """
+        Initialize the market data system.
+        """
 
-        self.provider = ProviderFactory.create(provider)
+        self.provider_name = provider.lower()
+
+        self.provider = ProviderFactory.create(
+            self.provider_name
+        )
 
         self.history = HistoricalData()
 
         self.demo_history = DemoHistoricalData()
 
-        self.load_demo_history()
+        self.yahoo_history = YahooHistoricalData()
 
+        if self.provider_name == "demo":
 
+            self.load_demo_history()
+
+        elif self.provider_name == "yahoo":
+
+            self.load_yahoo_history()
     # --------------------------------------------------
     # Provider Information
     # --------------------------------------------------
 
     def get_provider(self):
-        """Return the active provider."""
+        """
+        Return the active provider name.
+        """
 
         return self.provider.get_provider_name()
 
+    # --------------------------------------------------
+    # Symbol Translation
+    # --------------------------------------------------
+
+    def _provider_symbol(self, symbol):
+        """
+        Translate internal HAPT symbols into
+        provider-specific symbols.
+        """
+
+        if self.provider_name == "yahoo":
+
+            return self.YAHOO_SYMBOLS.get(
+                symbol,
+                symbol,
+            )
+
+        return symbol
 
     # --------------------------------------------------
-    # Live / Current Price
+    # Live Prices
     # --------------------------------------------------
 
     def get_price(self, symbol):
-        """Return the latest price."""
+        """
+        Return the latest market price.
+        """
 
-        return self.provider.get_price(symbol)
+        provider_symbol = self._provider_symbol(
+            symbol
+        )
 
+        return self.provider.get_price(
+            provider_symbol
+        )
 
     def symbol_exists(self, symbol):
-        """Return True if the symbol exists."""
+        """
+        Return True if the symbol exists.
+        """
 
-        return self.provider.symbol_exists(symbol)
+        provider_symbol = self._provider_symbol(
+            symbol
+        )
 
+        return self.provider.symbol_exists(
+            provider_symbol
+        )
 
     def get_all_prices(self):
-        """Return all available prices."""
+        """
+        Return all available prices.
+
+        Not every provider supports this
+        operation.
+        """
 
         return self.provider.get_all_prices()
-
-
     # --------------------------------------------------
     # Historical Data
     # --------------------------------------------------
 
-    def add_historical_data(self, symbol, timeframe, candles):
-        """Store historical candle data."""
+    def add_historical_data(
+        self,
+        symbol,
+        timeframe,
+        candles,
+    ):
+        """
+        Store historical candles.
+        """
 
         self.history.add_candles(
             symbol,
             timeframe,
-            candles
+            candles,
         )
 
-
-    def get_historical_data(self, symbol, timeframe="5m"):
-        """Return historical candle data."""
+    def get_historical_data(
+        self,
+        symbol,
+        timeframe="5m",
+    ):
+        """
+        Return historical candles.
+        """
 
         return self.history.get_candles(
             symbol,
-            timeframe
+            timeframe,
         )
 
-
-    def has_historical_data(self, symbol, timeframe="5m"):
-        """Return True if historical data exists."""
+    def has_historical_data(
+        self,
+        symbol,
+        timeframe="5m",
+    ):
+        """
+        Return True if historical data exists.
+        """
 
         return self.history.has_data(
             symbol,
-            timeframe
+            timeframe,
         )
 
-
     # --------------------------------------------------
-    # Demo Historical Data
+    # Historical Loaders
     # --------------------------------------------------
 
     def load_demo_history(self):
@@ -107,36 +213,39 @@ class MarketData:
         Load demo historical candles.
         """
 
-        symbols = [
-            "MES",
-            "MNQ",
-            "M2K",
-            "MYM",
-            "ES",
-            "NQ",
-            "RTY",
-            "YM",
-            "CL",
-            "GC"
-        ]
+        for symbol in self.DEFAULT_SYMBOLS:
 
-
-        for symbol in symbols:
-
-            candles = self.demo_history.generate(symbol)
+            candles = self.demo_history.generate(
+                symbol
+            )
 
             self.add_historical_data(
                 symbol,
                 "5m",
-                candles
+                candles,
             )
 
+    def load_yahoo_history(self):
+        """
+        Load Yahoo Finance historical candles.
+        """
 
-    # --------------------------------------------------
-    # Maintenance
-    # --------------------------------------------------
+        for symbol in self.DEFAULT_SYMBOLS:
 
-    def clear_history(self):
-        """Clear all historical data."""
+            provider_symbol = self._provider_symbol(
+                symbol
+            )
 
-        self.history.clear()
+            candles = (
+                self.yahoo_history.get_candles(
+                    provider_symbol
+                )
+            )
+
+            if candles:
+
+                self.add_historical_data(
+                    symbol,
+                    "5m",
+                    candles,
+                )

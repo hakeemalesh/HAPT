@@ -31,12 +31,13 @@ class ProviderFactory:
 
         provider_name = provider_name.lower()
 
-        if provider_name == "demo":
-            return DemoProvider()
+if provider_name == "demo":
+    return DemoProvider()
 
-        if provider_name == "yahoo":
-            return YahooProvider()
+if provider_name == "yahoo":
+    return YahooProvider()
 
-        raise ValueError(
-            f"Unsupported provider: {provider_name}"
-        )
+raise ValueError(
+    f"Unsupported provider: {provider_name}"
+)
+

@@ -15,7 +15,7 @@ than individual data sources.
 
 
 from app.datafeed.demo_historical_data import DemoHistoricalData
-from app.datafeed.data_provider import DataProvider
+from app.datafeed.providers.provider_factory import ProviderFactory
 from app.datafeed.historical_data import HistoricalData
 
 
@@ -25,7 +25,7 @@ class MarketData:
     def __init__(self, provider="demo"):
         """Initialize the market data system."""
 
-        self.provider = DataProvider(provider)
+        self.provider = ProviderFactory.create(provider)
 
         self.history = HistoricalData()
 

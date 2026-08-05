@@ -63,3 +63,12 @@ production_review/
 review_files/
 review_files_2/
 review_main/
+# Backup files
+*.bak
+*.orig
+*.tmp
+
+# Python cache
+__pycache__/
+*.pyc
+

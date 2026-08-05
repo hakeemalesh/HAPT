@@ -21,7 +21,6 @@ class MarketContext:
         symbol,
         indicators,
         price,
-        market_structure=None,
     ):
         """
         Build the current market context.
@@ -33,8 +32,6 @@ class MarketContext:
         indicators : dict
 
         price : float
-
-        market_structure : dict, optional
 
         Returns
         -------
@@ -67,46 +64,23 @@ class MarketContext:
         macd = indicators.get("macd", {})
         volume = indicators.get("volume", {})
 
-        #
-        # Default market structure
-        #
-        if market_structure is None:
-
-            market_structure = {
-                "structure": None,
-                "trend": None,
-                "strength": 0,
-                "higher_highs": False,
-                "higher_lows": False,
-                "lower_highs": False,
-                "lower_lows": False,
-            }
-
         return {
 
-            #
             # Instrument
-            #
             "symbol": symbol,
             "price": price,
 
-            #
             # Market Information
-            #
             "market": session.get("market"),
             "timezone": session.get("timezone"),
             "current_time": session.get("current_time"),
             "market_open": session.get("market_open"),
 
-            #
             # Session
-            #
             "session": session.get("session"),
             "session_score": session.get("session_score"),
 
-            #
             # Indicators
-            #
             "ema_9": ema.get("ema_9"),
             "ema_20": ema.get("ema_20"),
             "ema_50": ema.get("ema_50"),
@@ -126,33 +100,7 @@ class MarketContext:
 
             "high_volume": volume.get("high_volume"),
 
-            #
-            # Market Structure
-            #
-            "market_structure":
-                market_structure.get("structure"),
-
-            "market_trend":
-                market_structure.get("trend"),
-
-            "structure_strength":
-                market_structure.get("strength"),
-
-            "higher_highs":
-                market_structure.get("higher_highs"),
-
-            "higher_lows":
-                market_structure.get("higher_lows"),
-
-            "lower_highs":
-                market_structure.get("lower_highs"),
-
-            "lower_lows":
-                market_structure.get("lower_lows"),
-
-            #
             # Future Expansion
-            #
             "economic_news": None,
             "holiday": None,
             "market_regime": None,

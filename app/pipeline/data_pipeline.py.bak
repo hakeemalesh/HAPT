@@ -10,9 +10,6 @@ from app.processing.candle_processor import CandleProcessor
 from app.indicators.indicator_engine import IndicatorEngine
 from app.context.market_context import MarketContext
 from app.opportunity.opportunity_engine import OpportunityEngine
-from app.market_structure.market_structure_analyzer import (
-    MarketStructureAnalyzer,
-)
 
 
 class DataPipeline:
@@ -44,29 +41,16 @@ class DataPipeline:
         dict
         """
 
-        #
-        # Historical candles
-        #
-        candles = self.market_data.get_historical_data(
-            symbol
-        )
+        candles = self.market_data.get_historical_data(symbol)
 
         if not candles:
             return None
 
-        #
-        # Extract OHLCV series
-        #
-        series = CandleProcessor.extract(
-            candles
-        )
+        series = CandleProcessor.extract(candles)
 
         if not series:
             return None
 
-        #
-        # Technical Indicators
-        #
         indicators = IndicatorEngine.calculate(
             closes=series["closes"],
             highs=series["highs"],
@@ -77,28 +61,12 @@ class DataPipeline:
         if not indicators:
             return None
 
-        #
-        # Market Structure
-        #
-        structure = (
-            MarketStructureAnalyzer.analyze(
-                candles
-            )
-        )
-
-        #
-        # Build Context
-        #
         market_context = self.market_context.build(
             symbol=symbol,
             price=price,
             indicators=indicators,
-            market_structure=structure,
         )
 
-        #
-        # Opportunity Analysis
-        #
         market_context["opportunity"] = (
             self.opportunity_engine.score(
                 market_context

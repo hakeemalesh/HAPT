@@ -83,63 +83,6 @@ class DecisionEngine:
 
             return decision
 
-        #
-        # ------------------------------------------
-        # Opportunity Engine (V2 Path)
-        # ------------------------------------------
-        #
-
-        opportunity = context.get("opportunity")
-
-        if opportunity:
-
-            decision = Decision()
-
-            decision.symbol = context.get(
-                "symbol",
-                "",
-            )
-
-            decision.market = context.get(
-                "market",
-                "",
-            )
-
-            decision.score = opportunity.get(
-                "score",
-                opportunity.get("overall", 0),
-            )
-
-            decision.confidence = opportunity.get(
-                "confidence",
-                decision.score,
-            )
-
-            decision.grade = opportunity.get(
-                "grade",
-                "D",
-            )
-
-            recommendation = opportunity.get(
-                "recommendation",
-                "WAIT",
-            )
-
-            if recommendation == "IGNORE":
-                recommendation = "WAIT"
-
-            decision.signal = recommendation
-
-            decision.reasons = list(
-                opportunity.get("reasons", [])
-            )
-
-            decision.details = {
-                "source": "OpportunityEngine"
-            }
-
-            return decision
-
         score = 0
 
         details = {}

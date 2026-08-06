@@ -93,3 +93,46 @@ def test_next_returns_none_when_finished():
     engine.next()
 
     assert engine.next() is None
+def test_window_returns_empty_before_replay():
+    """Window is empty before replay starts."""
+
+    engine = ReplayEngine()
+
+    engine.load(sample_candles())
+
+    assert engine.window(3) == []
+
+
+def test_window_returns_recent_candles():
+    """Window returns the most recent candles."""
+
+    engine = ReplayEngine()
+
+    engine.load(sample_candles())
+
+    engine.next()
+    engine.next()
+    engine.next()
+
+    window = engine.window(2)
+
+    assert len(window) == 2
+    assert window[0]["close"] == 101
+    assert window[1]["close"] == 102
+
+
+def test_window_larger_than_history():
+    """Large window returns available history."""
+
+    engine = ReplayEngine()
+
+    engine.load(sample_candles())
+
+    engine.next()
+    engine.next()
+
+    window = engine.window(100)
+
+    assert len(window) == 2
+    assert window[0]["close"] == 100
+    assert window[1]["close"] == 101

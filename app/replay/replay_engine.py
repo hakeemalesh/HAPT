@@ -69,6 +69,22 @@ class ReplayEngine:
 
         return self._candles[self._index - 1]
 
+    def window(
+        self,
+        size,
+    ):
+        """
+        Return the most recent replay window.
+        """
+
+        if size <= 0:
+            return []
+
+        end = self._index
+        start = max(0, end - size)
+
+        return self._candles[start:end]
+
     def progress(self):
         """
         Return replay progress.

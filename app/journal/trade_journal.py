@@ -61,12 +61,70 @@ class TradeJournal:
 
         return self._trades[-1]
 
+    def approved_trades(self) -> list[Trade]:
+        """
+        Return approved trades.
+        """
+
+        return [
+            trade
+            for trade in self._trades
+            if trade.approved
+        ]
+
+    def rejected_trades(self) -> list[Trade]:
+        """
+        Return rejected trades.
+        """
+
+        return [
+            trade
+            for trade in self._trades
+            if not trade.approved
+        ]
+
     def count(self) -> int:
         """
         Return number of recorded trades.
         """
 
         return len(self._trades)
+
+    def approved_count(self) -> int:
+        """
+        Return number of approved trades.
+        """
+
+        return len(
+            self.approved_trades()
+        )
+
+    def rejected_count(self) -> int:
+        """
+        Return number of rejected trades.
+        """
+
+        return len(
+            self.rejected_trades()
+        )
+
+    def approval_rate(self) -> float:
+        """
+        Return approval percentage.
+        """
+
+        total = self.count()
+
+        if total == 0:
+            return 0.0
+
+        return round(
+            (
+                self.approved_count()
+                / total
+            ) * 100,
+            2,
+        )
 
     def winning_trades(self) -> int:
         """

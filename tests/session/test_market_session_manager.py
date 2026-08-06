@@ -130,3 +130,27 @@ def test_sunday_is_closed():
 
     assert session["name"] == "Market Closed"
     assert session["score"] == 0
+def test_christmas_is_closed():
+    """Christmas Day should always be closed."""
+
+    manager = MarketSessionManager()
+
+    session = manager.get_current_session(
+        datetime(2026, 12, 25, 10, 0)
+    )
+
+    assert session["name"] == "Market Closed"
+    assert session["score"] == 0
+
+
+def test_new_year_is_closed():
+    """New Year's Day should always be closed."""
+
+    manager = MarketSessionManager()
+
+    session = manager.get_current_session(
+        datetime(2026, 1, 1, 10, 0)
+    )
+
+    assert session["name"] == "Market Closed"
+    assert session["score"] == 0

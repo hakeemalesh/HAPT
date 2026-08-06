@@ -13,7 +13,7 @@ Supports both:
 
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
-
+from app.session.market_calendar import MarketCalendar
 from app.session.market_profiles import MARKET_PROFILES
 
 
@@ -25,7 +25,7 @@ class MarketSessionManager:
 
         self.market = market
         self.profile = MARKET_PROFILES[self.market]
-
+        self.calendar = MarketCalendar()
     def get_market_name(self):
         """Return the market name."""
 
@@ -91,14 +91,14 @@ class MarketSessionManager:
         """Return the current market session."""
 
         #
-        # Historical weekend detection.
+        # Historical calendar validation.
         #
-        if self._is_weekend(current_time):
+        if self.calendar.is_market_closed(current_time):
 
-            return {
-                "name": "Market Closed",
-                "score": 0,
-            }
+           return {
+               "name": "Market Closed",
+               "score": 0,
+           }
         market_time = self.get_current_time(
             current_time
         )

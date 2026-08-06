@@ -4,20 +4,18 @@ HAPT Profit & Loss Calculator
 
 Calculates gross and net futures profit/loss.
 
-Uses the TickValueEngine and CommissionEngine so
-results reflect contract specifications and
-trading costs.
+Includes:
+- Tick Value
+- Commission
+- Slippage
 
-Slippage and exchange fees will be added in
-later nodes.
+Future versions will include exchange fees,
+borrowing costs and taxes where applicable.
 """
 
-from app.pnl.commission_engine import (
-    CommissionEngine,
-)
-from app.pnl.tick_value_engine import (
-    TickValueEngine,
-)
+from app.pnl.commission_engine import CommissionEngine
+from app.pnl.slippage_engine import SlippageEngine
+from app.pnl.tick_value_engine import TickValueEngine
 
 
 class PnLCalculator:
@@ -31,18 +29,9 @@ class PnLCalculator:
         quantity=1,
         direction="LONG",
     ):
-        """
-        Calculate futures trade P&L.
+        """Calculate complete trade P&L."""
 
-        Returns
-        -------
-        dict
-        """
-
-        if direction not in (
-            "LONG",
-            "SHORT",
-        ):
+        if direction not in ("LONG", "SHORT"):
             raise ValueError(
                 "direction must be LONG or SHORT."
             )
@@ -70,8 +59,15 @@ class PnLCalculator:
             quantity,
         )
 
+        slippage = SlippageEngine.calculate(
+            symbol,
+            quantity,
+        )
+
         net_pnl = round(
-            gross_pnl - commission,
+            gross_pnl
+            - commission
+            - slippage,
             2,
         )
 
@@ -83,5 +79,6 @@ class PnLCalculator:
             "quantity": quantity,
             "gross_pnl": gross_pnl,
             "commission": commission,
+            "slippage": slippage,
             "net_pnl": net_pnl,
         }

@@ -36,6 +36,23 @@ def build_parser():
     return parser
 
 
+def print_distribution(title, data):
+    """Print a distribution table."""
+
+    print(title)
+    print("-" * len(title))
+
+    if not data:
+        print("None")
+        print()
+        return
+
+    for key in sorted(data):
+        print(f"{key:<20} : {data[key]}")
+
+    print()
+
+
 def main():
     """Program entry point."""
 
@@ -45,19 +62,19 @@ def main():
 
     candles = market.get_historical_data(args.symbol)
 
-    print("=" * 50)
-    print("HAPT Professional Opportunity Engine")
-    print("=" * 50)
-    print(f"Provider : {args.provider}")
-    print(f"Symbol   : {args.symbol}")
-    print(f"Candles  : {len(candles)}")
+    print("=" * 60)
+    print("HAPT PROFESSIONAL BACKTEST REPORT")
+    print("=" * 60)
+    print()
+
+    print(f"Provider             : {args.provider}")
+    print(f"Symbol               : {args.symbol}")
+    print(f"Historical Candles   : {len(candles)}")
     print()
 
     if not candles:
-        print("No historical data found.")
+        print("No historical data available.")
         return
-
-    print("Running replay...")
 
     runner = ReplayRunner()
 
@@ -68,11 +85,40 @@ def main():
 
     analyzer = PerformanceAnalyzer(journal)
 
-    print("Replay completed.")
+    summary = analyzer.summary()
+
+    print("Performance")
+    print("-----------")
+    print(
+        f"Trades Evaluated     : {summary['total_trades']}"
+    )
+    print(
+        f"Approved Trades      : {summary['approved_trades']}"
+    )
+    print(
+        f"Rejected Trades      : {summary['rejected_trades']}"
+    )
+    print(
+        f"Approval Rate        : "
+        f"{summary['approval_rate']:.2f}%"
+    )
+    print(
+        f"Average Risk/Reward  : "
+        f"{summary['average_risk_reward']:.2f}"
+    )
     print()
-    print(f"Trades generated : {journal.count()}")
-    print(f"Approved trades  : {analyzer.approved_trades()}")
-    print(f"Rejected trades  : {analyzer.rejected_trades()}")
+
+    print_distribution(
+        "Signal Distribution",
+        summary["signal_distribution"],
+    )
+
+    print_distribution(
+        "Grade Distribution",
+        summary["grade_distribution"],
+    )
+
+    print("=" * 60)
 
 
 if __name__ == "__main__":

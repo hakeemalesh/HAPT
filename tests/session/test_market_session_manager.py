@@ -1,0 +1,107 @@
+"""
+Tests for the HAPT Market Session Manager.
+"""
+
+from datetime import datetime, time
+
+import pytest
+
+from app.session.market_session_manager import (
+    MarketSessionManager,
+)
+
+
+def test_market_name():
+    """Market name should be returned."""
+
+    manager = MarketSessionManager()
+
+    assert manager.get_market_name() == "CME Futures"
+
+
+def test_datetime_input():
+    """Injected datetime should be accepted."""
+
+    manager = MarketSessionManager()
+
+    dt = datetime(2026, 7, 1, 10, 0)
+
+    assert manager.get_current_time(dt) == time(10, 0)
+
+
+def test_time_input():
+    """Injected time should be accepted."""
+
+    manager = MarketSessionManager()
+
+    t = time(15, 30)
+
+    assert manager.get_current_time(t) == t
+
+
+def test_invalid_time_type():
+    """Invalid types should raise TypeError."""
+
+    manager = MarketSessionManager()
+
+    with pytest.raises(TypeError):
+        manager.get_current_time("10:00")
+
+
+def test_market_open_session():
+    """10:00 should be Market Open."""
+
+    manager = MarketSessionManager()
+
+    session = manager.get_current_session(
+        time(10, 0)
+    )
+
+    assert session["name"] == "Market Open"
+    assert session["score"] == 5
+
+
+def test_market_closed_session():
+    """03:00 should be Market Closed."""
+
+    manager = MarketSessionManager()
+
+    session = manager.get_current_session(
+        time(3, 0)
+    )
+
+    assert session["name"] == "Market Closed"
+    assert session["score"] == 0
+
+
+def test_market_open_flag():
+    """Market should be open during session."""
+
+    manager = MarketSessionManager()
+
+    assert manager.is_market_open(
+        time(10, 0)
+    ) is True
+
+
+def test_market_closed_flag():
+    """Market should be closed outside sessions."""
+
+    manager = MarketSessionManager()
+
+    assert manager.is_market_open(
+        time(3, 0)
+    ) is False
+
+
+def test_market_context_uses_supplied_time():
+    """Context should reflect supplied time."""
+
+    manager = MarketSessionManager()
+
+    context = manager.get_market_context(
+        time(15, 15)
+    )
+
+    assert context["session"] == "Power Hour"
+    assert context["market_open"] is True

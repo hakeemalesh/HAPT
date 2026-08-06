@@ -6,6 +6,8 @@ Coordinates historical replay using the production
 ReplayEngine and HistoricalContextBuilder.
 """
 
+from datetime import datetime
+
 from app.backtesting.historical_context_builder import (
     HistoricalContextBuilder,
 )
@@ -38,21 +40,13 @@ class ReplayController:
             else HistoricalContextBuilder()
         )
 
-        #
-        # Symbol currently being replayed.
-        #
-        self.symbol = None
-
     def load(
         self,
-        symbol,
         candles,
     ):
         """
-        Load historical candles for a symbol.
+        Load historical candles.
         """
-
-        self.symbol = symbol
 
         self.replay_engine.load(candles)
 
@@ -62,6 +56,42 @@ class ReplayController:
         """
 
         return self.replay_engine.has_next()
+
+    def _parse_timestamp(
+        self,
+        candle,
+    ):
+        """
+        Convert a candle timestamp into a datetime.
+
+        Returns None if the timestamp cannot be
+        interpreted (for example demo data like "T17").
+        """
+
+        timestamp = candle.get("timestamp")
+
+        if isinstance(timestamp, datetime):
+            return timestamp
+
+        if not isinstance(timestamp, str):
+            return None
+
+        #
+        # Demo timestamps ("T17") are intentionally ignored.
+        #
+        if timestamp.startswith("T"):
+            return None
+
+        try:
+            #
+            # Yahoo timestamps are stored as strings.
+            #
+            return datetime.fromisoformat(
+                timestamp.replace("Z", "+00:00")
+            )
+
+        except ValueError:
+            return None
 
     def next_context(self):
         """
@@ -83,7 +113,10 @@ class ReplayController:
         )
 
         return self.context_builder.build(
-            symbol=self.symbol,
+            symbol=candle.get("symbol", "UNKNOWN"),
             price=candle["close"],
             candles=window,
+            current_time=self._parse_timestamp(
+                candle
+            ),
         )

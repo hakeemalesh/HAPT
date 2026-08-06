@@ -5,7 +5,9 @@ HAPT Market Context
 Creates a single source of truth for the current market.
 """
 
-from app.session.market_session_manager import MarketSessionManager
+from app.session.market_session_manager import (
+    MarketSessionManager,
+)
 
 
 class MarketContext:
@@ -22,6 +24,7 @@ class MarketContext:
         indicators,
         price,
         market_structure=None,
+        current_time=None,
     ):
         """
         Build the current market context.
@@ -35,6 +38,8 @@ class MarketContext:
         price : float
 
         market_structure : dict, optional
+
+        current_time : datetime | time, optional
 
         Returns
         -------
@@ -56,7 +61,9 @@ class MarketContext:
                 "Price cannot be None."
             )
 
-        session = self.session_manager.get_market_context()
+        session = self.session_manager.get_market_context(
+            current_time=current_time
+        )
 
         if not session:
             raise ValueError(
@@ -67,9 +74,6 @@ class MarketContext:
         macd = indicators.get("macd", {})
         volume = indicators.get("volume", {})
 
-        #
-        # Default market structure
-        #
         if market_structure is None:
 
             market_structure = {

@@ -42,21 +42,35 @@ class DummyContextBuilder:
         symbol,
         price,
         candles,
+        current_time=None,
     ):
         return {
             "symbol": symbol,
             "price": price,
             "candles": candles,
+            "current_time": current_time,
         }
 
 
-def sample_candles():
+def sample_candles(symbol="MES"):
     """Return sample replay candles."""
 
     return [
-        {"close": 100.0},
-        {"close": 101.0},
-        {"close": 102.0},
+        {
+            "symbol": symbol,
+            "timestamp": "T0",
+            "close": 100.0,
+        },
+        {
+            "symbol": symbol,
+            "timestamp": "T1",
+            "close": 101.0,
+        },
+        {
+            "symbol": symbol,
+            "timestamp": "T2",
+            "close": 102.0,
+        },
     ]
 
 
@@ -69,12 +83,10 @@ def test_load():
     )
 
     controller.load(
-        "MES",
         sample_candles(),
     )
 
     assert controller.has_next() is True
-    assert controller.symbol == "MES"
 
 
 def test_next_context():
@@ -86,7 +98,6 @@ def test_next_context():
     )
 
     controller.load(
-        "MES",
         sample_candles(),
     )
 
@@ -105,16 +116,13 @@ def test_next_context_returns_none():
         context_builder=DummyContextBuilder(),
     )
 
-    controller.load(
-        "MES",
-        [],
-    )
+    controller.load([])
 
     assert controller.next_context() is None
 
 
 def test_symbol_is_preserved():
-    """ReplayController preserves the replay symbol."""
+    """ReplayController preserves the candle symbol."""
 
     controller = ReplayController(
         replay_engine=DummyReplayEngine(),
@@ -122,8 +130,7 @@ def test_symbol_is_preserved():
     )
 
     controller.load(
-        "MNQ",
-        sample_candles(),
+        sample_candles("MNQ"),
     )
 
     context = controller.next_context()

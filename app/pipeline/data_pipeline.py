@@ -5,14 +5,14 @@ HAPT Data Pipeline
 Coordinates the complete market data flow.
 """
 
-from app.datafeed.market_data import MarketData
-from app.processing.candle_processor import CandleProcessor
-from app.indicators.indicator_engine import IndicatorEngine
 from app.context.market_context import MarketContext
-from app.opportunity.opportunity_engine import OpportunityEngine
+from app.datafeed.market_data import MarketData
+from app.indicators.indicator_engine import IndicatorEngine
 from app.market_structure.market_structure_analyzer import (
     MarketStructureAnalyzer,
 )
+from app.opportunity.opportunity_engine import OpportunityEngine
+from app.processing.candle_processor import CandleProcessor
 
 
 class DataPipeline:
@@ -30,6 +30,7 @@ class DataPipeline:
         symbol,
         price,
         candles=None,
+        current_time=None,
     ):
         """
         Build a complete market context.
@@ -40,9 +41,13 @@ class DataPipeline:
 
         price : float
 
+        candles : list | None
+
+        current_time : datetime | time | None
+
         Returns
         -------
-        dict
+        dict | None
         """
 
         #
@@ -97,6 +102,7 @@ class DataPipeline:
             price=price,
             indicators=indicators,
             market_structure=structure,
+            current_time=current_time,
         )
 
         #
@@ -109,4 +115,3 @@ class DataPipeline:
         )
 
         return market_context
-

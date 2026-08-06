@@ -100,9 +100,8 @@ def main():
     runner = ReplayRunner()
 
     journal = runner.run(
-        args.symbol,
-        candles,
-    )
+    candles,
+)
 
     analyzer = PerformanceAnalyzer(journal)
 

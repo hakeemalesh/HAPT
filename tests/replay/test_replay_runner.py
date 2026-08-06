@@ -12,14 +12,11 @@ class DummyReplayController:
     def __init__(self, contexts):
         self._contexts = list(contexts)
         self._index = 0
-        self.symbol = None
 
     def load(
         self,
-        symbol,
         candles,
     ):
-        self.symbol = symbol
         self._index = 0
 
     def has_next(self):
@@ -83,7 +80,6 @@ def test_runner_returns_trade_journal():
     )
 
     journal = runner.run(
-        "MES",
         [],
     )
 
@@ -101,7 +97,6 @@ def test_trade_symbol():
     )
 
     journal = runner.run(
-        "MES",
         [],
     )
 
@@ -121,7 +116,6 @@ def test_trade_price():
     )
 
     trade = runner.run(
-        "MES",
         [],
     ).get_latest_trade()
 
@@ -137,7 +131,6 @@ def test_empty_replay():
     )
 
     journal = runner.run(
-        "MES",
         [],
     )
 
@@ -167,7 +160,6 @@ def test_runner_skips_none_context():
     )
 
     journal = runner.run(
-        "MES",
         [],
     )
 

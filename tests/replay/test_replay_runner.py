@@ -124,3 +124,35 @@ def test_empty_replay():
     journal = runner.run([])
 
     assert journal.count() == 0
+
+
+def test_runner_skips_none_context():
+    """ReplayRunner skips None contexts and continues."""
+
+    contexts = [
+        {
+            "symbol": "MES",
+            "price": 100.0,
+        },
+        None,
+        {
+            "symbol": "MES",
+            "price": 102.0,
+        },
+    ]
+
+    runner = ReplayRunner(
+        replay_controller=DummyReplayController(
+            contexts
+        ),
+        strategy_engine=DummyStrategyEngine(),
+    )
+
+    journal = runner.run([])
+
+    assert journal.count() == 2
+
+    trades = journal.get_trades()
+
+    assert trades[0].entry_price == 100.0
+    assert trades[1].entry_price == 102.0

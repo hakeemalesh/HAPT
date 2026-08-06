@@ -21,7 +21,10 @@ class BacktestEngine:
         journal = TradeJournal()
 
         for candle in candles:
-            trade = self.strategy_engine.evaluate(candle)
+            trade = self.strategy_engine.analyze(
+    context=candle,
+    entry_price=candle["close"],
+)
 
             if trade is not None:
                 journal.add_trade(trade)

@@ -14,7 +14,11 @@ class DummyStrategyEngine:
         self._results = results
         self._index = 0
 
-    def evaluate(self, candle):
+    def analyze(
+        self,
+        context,
+        entry_price,
+    ):
         """Return the next predefined result."""
 
         if self._index >= len(self._results):
@@ -22,6 +26,7 @@ class DummyStrategyEngine:
 
         result = self._results[self._index]
         self._index += 1
+
         return result
 
 

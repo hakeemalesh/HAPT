@@ -13,6 +13,7 @@ Supports both:
 
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
+
 from app.session.market_calendar import MarketCalendar
 from app.session.market_profiles import MARKET_PROFILES
 
@@ -26,6 +27,7 @@ class MarketSessionManager:
         self.market = market
         self.profile = MARKET_PROFILES[self.market]
         self.calendar = MarketCalendar()
+
     def get_market_name(self):
         """Return the market name."""
 
@@ -62,22 +64,20 @@ class MarketSessionManager:
             timezone
         ).time()
 
-    
     def get_current_session(
         self,
         current_time=None,
     ):
         """Return the current market session."""
 
-        #
-        # Historical calendar validation.
-        #
-        if self.calendar.is_market_closed(current_time):
+        if self.calendar.is_market_closed(
+            current_time
+        ):
+            return {
+                "name": "Market Closed",
+                "score": 0,
+            }
 
-           return {
-               "name": "Market Closed",
-               "score": 0,
-           }
         market_time = self.get_current_time(
             current_time
         )
@@ -108,6 +108,62 @@ class MarketSessionManager:
             )["score"] > 0
         )
 
+    def _session_quality(
+        self,
+        session_name,
+    ):
+        """
+        Return descriptive information about
+        the current trading session.
+        """
+
+        quality = {
+            "Market Open": (
+                "Excellent",
+                "High",
+                "High",
+            ),
+            "Morning": (
+                "Good",
+                "High",
+                "High",
+            ),
+            "Afternoon": (
+                "Good",
+                "Moderate",
+                "Medium",
+            ),
+            "Power Hour": (
+                "Excellent",
+                "High",
+                "High",
+            ),
+            "Pre-Market": (
+                "Fair",
+                "Moderate",
+                "Medium",
+            ),
+            "Lunch": (
+                "Poor",
+                "Low",
+                "Low",
+            ),
+            "After Hours": (
+                "Poor",
+                "Low",
+                "Low",
+            ),
+        }
+
+        return quality.get(
+            session_name,
+            (
+                "Closed",
+                "None",
+                "None",
+            ),
+        )
+
     def get_market_context(
         self,
         current_time=None,
@@ -122,6 +178,14 @@ class MarketSessionManager:
             current_time
         )
 
+        (
+            session_quality,
+            liquidity,
+            trade_confidence,
+        ) = self._session_quality(
+            session["name"]
+        )
+
         return {
             "market": self.profile["name"],
             "timezone": self.profile["timezone"],
@@ -130,6 +194,12 @@ class MarketSessionManager:
             ),
             "session": session["name"],
             "session_score": session["score"],
+            "session_quality": session_quality,
+            "liquidity": liquidity,
+            "trade_confidence": trade_confidence,
+            "early_close": self.calendar.is_early_close(
+                current_time
+            ),
             "market_open": (
                 session["score"] > 0
             ),

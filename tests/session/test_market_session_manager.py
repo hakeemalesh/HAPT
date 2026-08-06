@@ -154,3 +154,49 @@ def test_new_year_is_closed():
 
     assert session["name"] == "Market Closed"
     assert session["score"] == 0
+def test_session_quality():
+    """Market Open should have excellent quality."""
+
+    manager = MarketSessionManager()
+
+    context = manager.get_market_context(
+        time(10, 0)
+    )
+
+    assert context["session_quality"] == "Excellent"
+
+
+def test_liquidity():
+    """Market Open should report high liquidity."""
+
+    manager = MarketSessionManager()
+
+    context = manager.get_market_context(
+        time(10, 0)
+    )
+
+    assert context["liquidity"] == "High"
+
+
+def test_trade_confidence():
+    """Market Open should report high confidence."""
+
+    manager = MarketSessionManager()
+
+    context = manager.get_market_context(
+        time(10, 0)
+    )
+
+    assert context["trade_confidence"] == "High"
+
+
+def test_early_close_flag():
+    """Normal trading day should not be an early close."""
+
+    manager = MarketSessionManager()
+
+    context = manager.get_market_context(
+        datetime(2026, 7, 1, 10, 0)
+    )
+
+    assert context["early_close"] is False

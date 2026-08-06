@@ -17,6 +17,7 @@ class DummyPipeline:
         self,
         symbol,
         price,
+        candles=None,
     ):
         return self.result
 

@@ -29,6 +29,7 @@ class DataPipeline:
         self,
         symbol,
         price,
+        candles=None,
     ):
         """
         Build a complete market context.
@@ -47,9 +48,11 @@ class DataPipeline:
         #
         # Historical candles
         #
-        candles = self.market_data.get_historical_data(
-            symbol
-        )
+        if candles is None:
+
+            candles = self.market_data.get_historical_data(
+                symbol
+            )
 
         if not candles:
             return None
@@ -106,3 +109,4 @@ class DataPipeline:
         )
 
         return market_context
+

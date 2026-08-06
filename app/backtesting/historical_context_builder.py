@@ -24,6 +24,7 @@ class HistoricalContextBuilder:
         self,
         symbol: str,
         price: float,
+        candles=None,
     ) -> dict | None:
         """
         Build a historical market context.
@@ -34,6 +35,10 @@ class HistoricalContextBuilder:
 
         price : float
 
+        candles : list | None
+            Historical candles supplied by the replay engine.
+            If None, the DataPipeline will load them normally.
+
         Returns
         -------
         dict | None
@@ -42,4 +47,6 @@ class HistoricalContextBuilder:
         return self.pipeline.build_context(
             symbol=symbol,
             price=price,
+            candles=candles,
         )
+ 

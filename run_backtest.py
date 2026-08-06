@@ -48,7 +48,28 @@ def print_distribution(title, data):
         return
 
     for key in sorted(data):
-        print(f"{key:<20} : {data[key]}")
+        print(f"{key:<25} : {data[key]}")
+
+    print()
+
+
+def print_rejection_reasons(data):
+    """Print rejection reasons ordered by frequency."""
+
+    print("Top Rejection Reasons")
+    print("---------------------")
+
+    if not data:
+        print("None")
+        print()
+        return
+
+    for reason, count in sorted(
+        data.items(),
+        key=lambda item: item[1],
+        reverse=True,
+    ):
+        print(f"{reason:<25} : {count}")
 
     print()
 
@@ -116,6 +137,10 @@ def main():
     print_distribution(
         "Grade Distribution",
         summary["grade_distribution"],
+    )
+
+    print_rejection_reasons(
+        summary["rejection_reasons"],
     )
 
     print("=" * 60)

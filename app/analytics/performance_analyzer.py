@@ -36,15 +36,7 @@ class PerformanceAnalyzer:
     def approval_rate(self) -> float:
         """Return approval percentage."""
 
-        total = self.total_trades()
-
-        if total == 0:
-            return 0.0
-
-        return round(
-            (self.approved_trades() / total) * 100,
-            2,
-        )
+        return self.journal.approval_rate()
 
     def average_risk_reward(self) -> float:
         """Return average risk/reward ratio."""
@@ -71,12 +63,24 @@ class PerformanceAnalyzer:
 
         return dict(Counter(signals))
 
+    def rejection_reason_distribution(self) -> dict[str, int]:
+        """
+        Return rejection reasons ranked by frequency.
+        """
+
+        reasons = Counter()
+
+        for trade in self.journal.rejected_trades():
+
+            for note in trade.notes:
+
+                reasons[note] += 1
+
+        return dict(reasons)
+
     def summary(self) -> dict:
         """
         Return a complete performance summary.
-
-        This method is intended for CLI reporting
-        and future GUI integration.
         """
 
         return {
@@ -92,5 +96,8 @@ class PerformanceAnalyzer:
             ),
             "grade_distribution": (
                 self.grade_distribution()
+            ),
+            "rejection_reasons": (
+                self.rejection_reason_distribution()
             ),
         }

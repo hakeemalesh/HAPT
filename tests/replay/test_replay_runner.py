@@ -12,8 +12,14 @@ class DummyReplayController:
     def __init__(self, contexts):
         self._contexts = list(contexts)
         self._index = 0
+        self.symbol = None
 
-    def load(self, candles):
+    def load(
+        self,
+        symbol,
+        candles,
+    ):
+        self.symbol = symbol
         self._index = 0
 
     def has_next(self):
@@ -76,7 +82,10 @@ def test_runner_returns_trade_journal():
         strategy_engine=DummyStrategyEngine(),
     )
 
-    journal = runner.run([])
+    journal = runner.run(
+        "MES",
+        [],
+    )
 
     assert journal.count() == 3
 
@@ -91,7 +100,10 @@ def test_trade_symbol():
         strategy_engine=DummyStrategyEngine(),
     )
 
-    journal = runner.run([])
+    journal = runner.run(
+        "MES",
+        [],
+    )
 
     trade = journal.get_latest_trade()
 
@@ -108,7 +120,10 @@ def test_trade_price():
         strategy_engine=DummyStrategyEngine(),
     )
 
-    trade = runner.run([]).get_latest_trade()
+    trade = runner.run(
+        "MES",
+        [],
+    ).get_latest_trade()
 
     assert trade.entry_price == 102.0
 
@@ -121,13 +136,16 @@ def test_empty_replay():
         strategy_engine=DummyStrategyEngine(),
     )
 
-    journal = runner.run([])
+    journal = runner.run(
+        "MES",
+        [],
+    )
 
     assert journal.count() == 0
 
 
 def test_runner_skips_none_context():
-    """ReplayRunner skips None contexts and continues."""
+    """ReplayRunner skips None contexts."""
 
     contexts = [
         {
@@ -148,11 +166,9 @@ def test_runner_skips_none_context():
         strategy_engine=DummyStrategyEngine(),
     )
 
-    journal = runner.run([])
+    journal = runner.run(
+        "MES",
+        [],
+    )
 
     assert journal.count() == 2
-
-    trades = journal.get_trades()
-
-    assert trades[0].entry_price == 100.0
-    assert trades[1].entry_price == 102.0

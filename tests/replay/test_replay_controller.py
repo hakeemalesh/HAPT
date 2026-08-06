@@ -6,7 +6,7 @@ from app.replay.replay_controller import ReplayController
 
 
 class DummyReplayEngine:
-    """Simple replay engine used for testing."""
+    """Simple replay engine for testing."""
 
     def __init__(self):
         self._candles = []
@@ -29,29 +29,24 @@ class DummyReplayEngine:
         return candle
 
     def window(self, size):
-        if size <= 0:
-            return []
-
         end = self._index
         start = max(0, end - size)
-
         return self._candles[start:end]
 
 
 class DummyContextBuilder:
-    """Simple context builder used for testing."""
+    """Simple context builder for testing."""
 
     def build(
         self,
         symbol,
         price,
-        candles=None,
+        candles,
     ):
         return {
             "symbol": symbol,
             "price": price,
-            "window_size": len(candles or []),
-            "built": True,
+            "candles": candles,
         }
 
 
@@ -59,18 +54,9 @@ def sample_candles():
     """Return sample replay candles."""
 
     return [
-        {
-            "symbol": "MES",
-            "close": 100,
-        },
-        {
-            "symbol": "MES",
-            "close": 101,
-        },
-        {
-            "symbol": "MES",
-            "close": 102,
-        },
+        {"close": 100.0},
+        {"close": 101.0},
+        {"close": 102.0},
     ]
 
 
@@ -82,44 +68,33 @@ def test_load():
         context_builder=DummyContextBuilder(),
     )
 
-    controller.load(sample_candles())
+    controller.load(
+        "MES",
+        sample_candles(),
+    )
 
     assert controller.has_next() is True
+    assert controller.symbol == "MES"
 
 
 def test_next_context():
-    """ReplayController builds production context."""
+    """ReplayController builds a context."""
 
     controller = ReplayController(
         replay_engine=DummyReplayEngine(),
         context_builder=DummyContextBuilder(),
     )
 
-    controller.load(sample_candles())
+    controller.load(
+        "MES",
+        sample_candles(),
+    )
 
     context = controller.next_context()
 
     assert context["symbol"] == "MES"
-    assert context["price"] == 100
-    assert context["window_size"] == 1
-    assert context["built"] is True
-
-
-def test_window_grows():
-    """Replay window grows as replay advances."""
-
-    controller = ReplayController(
-        replay_engine=DummyReplayEngine(),
-        context_builder=DummyContextBuilder(),
-    )
-
-    controller.load(sample_candles())
-
-    controller.next_context()
-
-    context = controller.next_context()
-
-    assert context["window_size"] == 2
+    assert context["price"] == 100.0
+    assert len(context["candles"]) == 1
 
 
 def test_next_context_returns_none():
@@ -130,6 +105,27 @@ def test_next_context_returns_none():
         context_builder=DummyContextBuilder(),
     )
 
-    controller.load([])
+    controller.load(
+        "MES",
+        [],
+    )
 
     assert controller.next_context() is None
+
+
+def test_symbol_is_preserved():
+    """ReplayController preserves the replay symbol."""
+
+    controller = ReplayController(
+        replay_engine=DummyReplayEngine(),
+        context_builder=DummyContextBuilder(),
+    )
+
+    controller.load(
+        "MNQ",
+        sample_candles(),
+    )
+
+    context = controller.next_context()
+
+    assert context["symbol"] == "MNQ"

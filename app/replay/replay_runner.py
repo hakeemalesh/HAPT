@@ -43,6 +43,7 @@ class ReplayRunner:
 
     def run(
         self,
+        symbol,
         candles,
     ) -> TradeJournal:
         """
@@ -50,6 +51,9 @@ class ReplayRunner:
 
         Parameters
         ----------
+        symbol : str
+            Instrument being replayed.
+
         candles : list
             Historical candle data.
 
@@ -61,7 +65,10 @@ class ReplayRunner:
 
         journal = TradeJournal()
 
-        self.replay_controller.load(candles)
+        self.replay_controller.load(
+            symbol,
+            candles,
+        )
 
         while self.replay_controller.has_next():
 

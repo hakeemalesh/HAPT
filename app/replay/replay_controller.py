@@ -38,13 +38,21 @@ class ReplayController:
             else HistoricalContextBuilder()
         )
 
+        #
+        # Symbol currently being replayed.
+        #
+        self.symbol = None
+
     def load(
         self,
+        symbol,
         candles,
     ):
         """
-        Load historical candles.
+        Load historical candles for a symbol.
         """
+
+        self.symbol = symbol
 
         self.replay_engine.load(candles)
 
@@ -75,7 +83,7 @@ class ReplayController:
         )
 
         return self.context_builder.build(
-            symbol=candle["symbol"],
+            symbol=self.symbol,
             price=candle["close"],
             candles=window,
         )

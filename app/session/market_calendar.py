@@ -9,8 +9,9 @@ Initially supports:
 
 - Weekend detection
 - Exchange holiday detection
+- Exchange early-close detection
 
-Additional functionality (early closes, half-days,
+Additional functionality (half-days,
 market-specific calendars) will be added in future
 nodes.
 """
@@ -22,11 +23,19 @@ class MarketCalendar:
     """Provides market calendar utilities."""
 
     #
-    # Initial holiday list.
+    # Exchange holidays.
     #
     HOLIDAYS = {
         (1, 1),      # New Year's Day
         (12, 25),    # Christmas Day
+    }
+
+    #
+    # Exchange early-close days.
+    #
+    EARLY_CLOSES = {
+        (12, 24),    # Christmas Eve
+        (11, 27),    # Black Friday (placeholder)
     }
 
     def is_weekend(
@@ -59,6 +68,23 @@ class MarketCalendar:
             current_time.month,
             current_time.day,
         ) in self.HOLIDAYS
+
+    def is_early_close(
+        self,
+        current_time,
+    ):
+        """
+        Return True if the supplied datetime falls on
+        an exchange early-close day.
+        """
+
+        if not isinstance(current_time, datetime):
+            return False
+
+        return (
+            current_time.month,
+            current_time.day,
+        ) in self.EARLY_CLOSES
 
     def is_market_closed(
         self,

@@ -85,6 +85,45 @@ def test_normal_day_is_not_holiday():
     )
 
 
+def test_christmas_eve_is_early_close():
+    """Christmas Eve should be an early-close day."""
+
+    calendar = MarketCalendar()
+
+    assert (
+        calendar.is_early_close(
+            datetime(2026, 12, 24, 10, 0)
+        )
+        is True
+    )
+
+
+def test_black_friday_is_early_close():
+    """Configured Black Friday should be an early-close day."""
+
+    calendar = MarketCalendar()
+
+    assert (
+        calendar.is_early_close(
+            datetime(2026, 11, 27, 10, 0)
+        )
+        is True
+    )
+
+
+def test_normal_day_is_not_early_close():
+    """Normal weekday should not be an early-close day."""
+
+    calendar = MarketCalendar()
+
+    assert (
+        calendar.is_early_close(
+            datetime(2026, 7, 22, 10, 0)
+        )
+        is False
+    )
+
+
 def test_market_closed_weekend():
     """Weekend should close market."""
 

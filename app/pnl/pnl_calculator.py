@@ -2,16 +2,19 @@
 HAPT Profit & Loss Calculator
 -----------------------------
 
-Calculates gross futures profit and loss.
+Calculates gross and net futures profit/loss.
 
-Uses the TickValueEngine so calculations are based
-on the correct futures contract specifications.
+Uses the TickValueEngine and CommissionEngine so
+results reflect contract specifications and
+trading costs.
 
-Commission, slippage and fees are intentionally
-excluded from this component and will be introduced
-in later nodes.
+Slippage and exchange fees will be added in
+later nodes.
 """
 
+from app.pnl.commission_engine import (
+    CommissionEngine,
+)
 from app.pnl.tick_value_engine import (
     TickValueEngine,
 )
@@ -29,20 +32,7 @@ class PnLCalculator:
         direction="LONG",
     ):
         """
-        Calculate gross futures P&L.
-
-        Parameters
-        ----------
-        symbol : str
-
-        entry_price : float
-
-        exit_price : float
-
-        quantity : int
-
-        direction : str
-            LONG or SHORT
+        Calculate futures trade P&L.
 
         Returns
         -------
@@ -66,16 +56,23 @@ class PnLCalculator:
         if direction == "SHORT":
             ticks *= -1
 
-        tick_value = (
-            TickValueEngine.get_tick_value(
-                symbol
-            )
+        tick_value = TickValueEngine.get_tick_value(
+            symbol
         )
 
-        gross_pnl = (
-            ticks
-            * tick_value
-            * quantity
+        gross_pnl = round(
+            ticks * tick_value * quantity,
+            2,
+        )
+
+        commission = CommissionEngine.calculate(
+            symbol,
+            quantity,
+        )
+
+        net_pnl = round(
+            gross_pnl - commission,
+            2,
         )
 
         return {
@@ -85,4 +82,6 @@ class PnLCalculator:
             "tick_value": tick_value,
             "quantity": quantity,
             "gross_pnl": gross_pnl,
+            "commission": commission,
+            "net_pnl": net_pnl,
         }

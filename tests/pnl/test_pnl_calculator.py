@@ -17,7 +17,9 @@ def test_mes_long_profit():
     )
 
     assert result["ticks"] == 4.0
-    assert result["gross_pnl"] == 5.0
+    assert result["gross_pnl"] == 5.00
+    assert result["commission"] == 1.24
+    assert result["net_pnl"] == 3.76
 
 
 def test_mes_long_loss():
@@ -29,8 +31,9 @@ def test_mes_long_loss():
         exit_price=5000.00,
     )
 
-    assert result["ticks"] == -4.0
-    assert result["gross_pnl"] == -5.0
+    assert result["gross_pnl"] == -5.00
+    assert result["commission"] == 1.24
+    assert result["net_pnl"] == -6.24
 
 
 def test_mes_short_profit():
@@ -43,8 +46,9 @@ def test_mes_short_profit():
         direction="SHORT",
     )
 
-    assert result["ticks"] == 4.0
-    assert result["gross_pnl"] == 5.0
+    assert result["gross_pnl"] == 5.00
+    assert result["commission"] == 1.24
+    assert result["net_pnl"] == 3.76
 
 
 def test_mes_short_loss():
@@ -57,12 +61,13 @@ def test_mes_short_loss():
         direction="SHORT",
     )
 
-    assert result["ticks"] == -4.0
-    assert result["gross_pnl"] == -5.0
+    assert result["gross_pnl"] == -5.00
+    assert result["commission"] == 1.24
+    assert result["net_pnl"] == -6.24
 
 
 def test_multiple_contracts():
-    """Multiple contracts should scale P&L."""
+    """Multiple contracts scale gross and commission."""
 
     result = PnLCalculator.calculate(
         symbol="MES",
@@ -71,11 +76,13 @@ def test_multiple_contracts():
         quantity=4,
     )
 
-    assert result["gross_pnl"] == 20.0
+    assert result["gross_pnl"] == 20.00
+    assert result["commission"] == 4.96
+    assert result["net_pnl"] == 15.04
 
 
-def test_es_tick_value():
-    """ES should use correct tick value."""
+def test_es_trade():
+    """ES uses correct tick value and commission."""
 
     result = PnLCalculator.calculate(
         symbol="ES",
@@ -83,11 +90,13 @@ def test_es_tick_value():
         exit_price=6001.00,
     )
 
-    assert result["gross_pnl"] == 50.0
+    assert result["gross_pnl"] == 50.00
+    assert result["commission"] == 2.48
+    assert result["net_pnl"] == 47.52
 
 
-def test_mnq_tick_value():
-    """MNQ should use correct tick value."""
+def test_mnq_trade():
+    """MNQ uses correct tick value and commission."""
 
     result = PnLCalculator.calculate(
         symbol="MNQ",
@@ -95,11 +104,13 @@ def test_mnq_tick_value():
         exit_price=22001.00,
     )
 
-    assert result["gross_pnl"] == 2.0
+    assert result["gross_pnl"] == 2.00
+    assert result["commission"] == 1.24
+    assert result["net_pnl"] == 0.76
 
 
-def test_nq_tick_value():
-    """NQ should use correct tick value."""
+def test_nq_trade():
+    """NQ uses correct tick value and commission."""
 
     result = PnLCalculator.calculate(
         symbol="NQ",
@@ -107,11 +118,13 @@ def test_nq_tick_value():
         exit_price=22001.00,
     )
 
-    assert result["gross_pnl"] == 20.0
+    assert result["gross_pnl"] == 20.00
+    assert result["commission"] == 2.48
+    assert result["net_pnl"] == 17.52
 
 
 def test_invalid_direction():
-    """Invalid direction should raise ValueError."""
+    """Invalid direction raises ValueError."""
 
     with pytest.raises(ValueError):
         PnLCalculator.calculate(
@@ -123,7 +136,7 @@ def test_invalid_direction():
 
 
 def test_invalid_symbol():
-    """Unknown symbol should raise ValueError."""
+    """Unknown symbol raises ValueError."""
 
     with pytest.raises(ValueError):
         PnLCalculator.calculate(

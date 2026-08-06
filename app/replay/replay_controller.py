@@ -2,7 +2,7 @@
 HAPT Replay Controller
 ----------------------
 
-Coordinates historical replay by combining the
+Coordinates historical replay using the production
 ReplayEngine and HistoricalContextBuilder.
 """
 
@@ -16,6 +16,8 @@ class ReplayController:
     """
     Coordinates historical replay.
     """
+
+    DEFAULT_WINDOW_SIZE = 200
 
     def __init__(
         self,
@@ -55,13 +57,12 @@ class ReplayController:
 
     def next_context(self):
         """
-        Advance replay and build context.
+        Advance replay by one candle and build a
+        production market context.
 
         Returns
         -------
         dict | None
-            Historical market context, or None
-            when replay has finished.
         """
 
         candle = self.replay_engine.next()
@@ -69,4 +70,12 @@ class ReplayController:
         if candle is None:
             return None
 
-        return self.context_builder.build(candle)
+        window = self.replay_engine.window(
+            self.DEFAULT_WINDOW_SIZE
+        )
+
+        return self.context_builder.build(
+            symbol=candle["symbol"],
+            price=candle["close"],
+            candles=window,
+        )

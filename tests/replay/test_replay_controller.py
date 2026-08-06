@@ -6,7 +6,7 @@ from app.replay.replay_controller import ReplayController
 
 
 class DummyReplayEngine:
-    """Simple replay engine for testing."""
+    """Simple replay engine used for testing."""
 
     def __init__(self):
         self._candles = []
@@ -25,26 +25,52 @@ class DummyReplayEngine:
 
         candle = self._candles[self._index]
         self._index += 1
+
         return candle
+
+    def window(self, size):
+        if size <= 0:
+            return []
+
+        end = self._index
+        start = max(0, end - size)
+
+        return self._candles[start:end]
 
 
 class DummyContextBuilder:
-    """Simple context builder for testing."""
+    """Simple context builder used for testing."""
 
-    def build(self, candle):
+    def build(
+        self,
+        symbol,
+        price,
+        candles=None,
+    ):
         return {
-            "close": candle["close"],
+            "symbol": symbol,
+            "price": price,
+            "window_size": len(candles or []),
             "built": True,
         }
 
 
 def sample_candles():
-    """Return sample candles."""
+    """Return sample replay candles."""
 
     return [
-        {"close": 100},
-        {"close": 101},
-        {"close": 102},
+        {
+            "symbol": "MES",
+            "close": 100,
+        },
+        {
+            "symbol": "MES",
+            "close": 101,
+        },
+        {
+            "symbol": "MES",
+            "close": 102,
+        },
     ]
 
 
@@ -62,7 +88,7 @@ def test_load():
 
 
 def test_next_context():
-    """ReplayController builds context."""
+    """ReplayController builds production context."""
 
     controller = ReplayController(
         replay_engine=DummyReplayEngine(),
@@ -73,8 +99,27 @@ def test_next_context():
 
     context = controller.next_context()
 
-    assert context["close"] == 100
+    assert context["symbol"] == "MES"
+    assert context["price"] == 100
+    assert context["window_size"] == 1
     assert context["built"] is True
+
+
+def test_window_grows():
+    """Replay window grows as replay advances."""
+
+    controller = ReplayController(
+        replay_engine=DummyReplayEngine(),
+        context_builder=DummyContextBuilder(),
+    )
+
+    controller.load(sample_candles())
+
+    controller.next_context()
+
+    context = controller.next_context()
+
+    assert context["window_size"] == 2
 
 
 def test_next_context_returns_none():

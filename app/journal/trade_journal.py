@@ -126,6 +126,24 @@ class TradeJournal:
             2,
         )
 
+    def average_risk_reward(self) -> float:
+        """
+        Return the average risk/reward ratio.
+        """
+
+        if not self._trades:
+            return 0.0
+
+        total = sum(
+            trade.risk_reward
+            for trade in self._trades
+        )
+
+        return round(
+            total / len(self._trades),
+            2,
+        )
+
     def winning_trades(self) -> int:
         """
         Return the number of winning trades.

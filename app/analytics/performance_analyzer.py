@@ -13,10 +13,7 @@ from app.journal.trade_journal import TradeJournal
 class PerformanceAnalyzer:
     """Calculates trading performance statistics."""
 
-    def __init__(
-        self,
-        journal: TradeJournal,
-    ):
+    def __init__(self, journal: TradeJournal):
         """Initialize the analyzer."""
 
         self.journal = journal
@@ -39,41 +36,61 @@ class PerformanceAnalyzer:
     def approval_rate(self) -> float:
         """Return approval percentage."""
 
-        return self.journal.approval_rate()
+        total = self.total_trades()
+
+        if total == 0:
+            return 0.0
+
+        return round(
+            (self.approved_trades() / total) * 100,
+            2,
+        )
 
     def average_risk_reward(self) -> float:
         """Return average risk/reward ratio."""
 
-        trades = self.journal.get_trades()
-
-        if not trades:
-            return 0.0
-
-        return round(
-            sum(
-                trade.risk_reward
-                for trade in trades
-            )
-            / len(trades),
-            2,
-        )
+        return self.journal.average_risk_reward()
 
     def grade_distribution(self) -> dict[str, int]:
         """Return trade count by grade."""
 
-        return dict(
-            Counter(
-                trade.grade
-                for trade in self.journal.get_trades()
-            )
+        grades = (
+            trade.grade
+            for trade in self.journal.get_trades()
         )
+
+        return dict(Counter(grades))
 
     def signal_distribution(self) -> dict[str, int]:
         """Return trade count by signal."""
 
-        return dict(
-            Counter(
-                trade.signal
-                for trade in self.journal.get_trades()
-            )
+        signals = (
+            trade.signal
+            for trade in self.journal.get_trades()
         )
+
+        return dict(Counter(signals))
+
+    def summary(self) -> dict:
+        """
+        Return a complete performance summary.
+
+        This method is intended for CLI reporting
+        and future GUI integration.
+        """
+
+        return {
+            "total_trades": self.total_trades(),
+            "approved_trades": self.approved_trades(),
+            "rejected_trades": self.rejected_trades(),
+            "approval_rate": self.approval_rate(),
+            "average_risk_reward": (
+                self.average_risk_reward()
+            ),
+            "signal_distribution": (
+                self.signal_distribution()
+            ),
+            "grade_distribution": (
+                self.grade_distribution()
+            ),
+        }

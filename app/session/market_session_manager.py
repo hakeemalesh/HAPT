@@ -62,12 +62,43 @@ class MarketSessionManager:
             timezone
         ).time()
 
+    def _is_weekend(
+        self,
+        current_time,
+    ):
+        """
+        Return True if the supplied datetime falls on
+        Saturday or Sunday.
+
+        If only a time object (or None) is supplied,
+        weekend detection is not possible.
+        """
+
+        if not isinstance(current_time, datetime):
+            return False
+
+        #
+        # Monday = 0
+        # Saturday = 5
+        # Sunday = 6
+        #
+        return current_time.weekday() >= 5
+    
     def get_current_session(
         self,
         current_time=None,
     ):
         """Return the current market session."""
 
+        #
+        # Historical weekend detection.
+        #
+        if self._is_weekend(current_time):
+
+            return {
+                "name": "Market Closed",
+                "score": 0,
+            }
         market_time = self.get_current_time(
             current_time
         )

@@ -105,3 +105,28 @@ def test_market_context_uses_supplied_time():
 
     assert context["session"] == "Power Hour"
     assert context["market_open"] is True
+
+def test_saturday_is_closed():
+    """Saturday should always be closed."""
+
+    manager = MarketSessionManager()
+
+    session = manager.get_current_session(
+        datetime(2026, 7, 25, 10, 0)
+    )
+
+    assert session["name"] == "Market Closed"
+    assert session["score"] == 0
+
+
+def test_sunday_is_closed():
+    """Sunday should always be closed."""
+
+    manager = MarketSessionManager()
+
+    session = manager.get_current_session(
+        datetime(2026, 7, 26, 10, 0)
+    )
+
+    assert session["name"] == "Market Closed"
+    assert session["score"] == 0

@@ -110,8 +110,7 @@ class OrderManager:
         return [
             managed
             for managed in self._orders.values()
-            if managed.order.status
-            not in terminal
+            if managed.order.status not in terminal
         ]
 
     def total_orders(self) -> int:

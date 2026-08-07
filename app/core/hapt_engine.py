@@ -11,24 +11,18 @@ business logic inside the individual
 engines.
 """
 
-from app.core.logger import setup_logger
-
-from app.market.market_manager import MarketManager
-from app.scanner.market_scanner import MarketScanner
-
-from app.strategy.strategy_engine import StrategyEngine
 from app.ai.ai_engine import AIEngine
-
-from app.datafeed.market_data import MarketData
-from app.pipeline.data_pipeline import DataPipeline
-
 from app.brokers.paper_broker import PaperBroker
+from app.core.logger import setup_logger
+from app.datafeed.market_data import MarketData
 from app.execution.execution_engine import ExecutionEngine
-
+from app.journal.trade_journal import TradeJournal
+from app.market.market_manager import MarketManager
+from app.pipeline.data_pipeline import DataPipeline
+from app.scanner.market_scanner import MarketScanner
+from app.strategy.strategy_engine import StrategyEngine
 from app.trade_planner.trade_planner import TradePlanner
 from app.trade_validator.trade_validator import TradeValidator
-
-from app.journal.trade_journal import TradeJournal
 from app.ui.trade_display import TradeDisplay
 
 

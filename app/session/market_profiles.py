@@ -10,7 +10,6 @@ the current session based on the selected market profile.
 
 from datetime import time
 
-
 MARKET_PROFILES = {
 
     "CME_FUTURES": {

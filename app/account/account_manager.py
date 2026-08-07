@@ -9,9 +9,9 @@ maintains the live account state.
 from app.account_state.account_state import AccountState
 from app.config.trading_account import (
     ACCOUNT_BALANCE,
-    RISK_PERCENT,
     ACCOUNT_CURRENCY,
     ACCOUNT_NAME,
+    RISK_PERCENT,
 )
 
 

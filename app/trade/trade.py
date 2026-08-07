@@ -16,7 +16,6 @@ This object is shared by:
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 
 
 @dataclass
@@ -31,17 +30,17 @@ class Trade:
 
     entry_price: float
 
-    entry_time: Optional[datetime] = None
+    entry_time: datetime | None = None
 
-    stop_loss: Optional[float] = None
+    stop_loss: float | None = None
 
-    take_profit: Optional[float] = None
+    take_profit: float | None = None
 
-    exit_price: Optional[float] = None
+    exit_price: float | None = None
 
-    exit_time: Optional[datetime] = None
+    exit_time: datetime | None = None
 
-    exit_reason: Optional[str] = None
+    exit_reason: str | None = None
 
     gross_pnl: float = 0.0
 

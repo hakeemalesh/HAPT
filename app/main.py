@@ -6,9 +6,9 @@ Starts the Hybrid AI Trading Platform.
 """
 
 from app.core.banner import show_banner
+from app.core.hapt_engine import HAPTEngine
 from app.core.logger import setup_logger
 from app.core.startup import run_startup_checks
-from app.core.hapt_engine import HAPTEngine
 
 
 def main():

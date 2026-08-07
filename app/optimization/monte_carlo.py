@@ -6,8 +6,8 @@ Evaluates strategy robustness by repeatedly
 randomizing the order of trade outcomes.
 """
 
-from dataclasses import dataclass
 import random
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)

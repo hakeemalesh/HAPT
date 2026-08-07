@@ -2,7 +2,6 @@
 Tests for the HAPT Secure Credentials Manager.
 """
 
-import os
 
 from app.integration.credentials_manager import (
     Credentials,

@@ -5,8 +5,8 @@ HAPT Secure Credentials Manager
 Handles broker credentials securely.
 """
 
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 
 
 @dataclass(slots=True)

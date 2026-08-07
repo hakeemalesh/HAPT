@@ -6,7 +6,6 @@ Generates a professional report for an
 entire research project.
 """
 
-from app.research.dashboard import ResearchDashboard
 
 
 class ResearchReport:

@@ -5,12 +5,12 @@ HAPT Indicator Engine
 Coordinates all technical indicator calculations.
 """
 
-from app.indicators.ema import EMA
-from app.indicators.rsi import RSI
-from app.indicators.macd import MACD
 from app.indicators.atr import ATR
-from app.indicators.vwap import VWAP
+from app.indicators.ema import EMA
+from app.indicators.macd import MACD
+from app.indicators.rsi import RSI
 from app.indicators.volume import Volume
+from app.indicators.vwap import VWAP
 
 
 class IndicatorEngine:

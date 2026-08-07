@@ -5,8 +5,10 @@ Unit tests for Opportunity Engine scoring.
 """
 
 import unittest
+
 from app.opportunity.opportunity_engine import OpportunityEngine
 from app.rules.trading_rules import TradingRules
+
 
 class TestOpportunityEngine(unittest.TestCase):
     def setUp(self):

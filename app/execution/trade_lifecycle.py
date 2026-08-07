@@ -6,7 +6,7 @@ Tracks valid order lifecycle transitions
 and records an audit trail.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from app.execution.order import (

@@ -23,10 +23,10 @@ Trade Model
 
 from app.calculator.contract_calculator import ContractCalculator
 from app.decision.decision_engine import DecisionEngine
+from app.models.trade import Trade
 from app.position_sizing.position_sizing_engine import (
     PositionSizingEngine,
 )
-from app.models.trade import Trade
 from app.risk.risk_manager import RiskManager
 
 

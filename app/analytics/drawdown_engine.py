@@ -35,13 +35,11 @@ class DrawdownEngine:
 
         for equity in equity_curve:
 
-            if equity > peak:
-                peak = equity
+            peak = max(peak, equity)
 
             drawdown = peak - equity
 
-            if drawdown > max_drawdown:
-                max_drawdown = drawdown
+            max_drawdown = max(max_drawdown, drawdown)
 
         current_peak = max(equity_curve)
         current_drawdown = current_peak - equity_curve[-1]

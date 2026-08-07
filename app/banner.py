@@ -4,7 +4,7 @@ HAPT Startup Banner
 Displays the HAPT welcome banner.
 """
 
-from app.version import APP_NAME, APP_FULL_NAME, VERSION, AUTHOR
+from app.version import APP_FULL_NAME, APP_NAME, AUTHOR, VERSION
 
 
 def show_banner():

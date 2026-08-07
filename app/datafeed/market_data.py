@@ -18,14 +18,14 @@ individual market data providers.
 from app.datafeed.demo_historical_data import (
     DemoHistoricalData,
 )
-from app.datafeed.yahoo_historical_data import (
-    YahooHistoricalData,
-)
 from app.datafeed.historical_data import (
     HistoricalData,
 )
 from app.datafeed.providers.provider_factory import (
     ProviderFactory,
+)
+from app.datafeed.yahoo_historical_data import (
+    YahooHistoricalData,
 )
 
 

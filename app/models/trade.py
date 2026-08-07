@@ -6,9 +6,9 @@ Represents the complete lifecycle of a trade,
 from planning through execution and closure.
 """
 
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-import uuid
 
 
 @dataclass

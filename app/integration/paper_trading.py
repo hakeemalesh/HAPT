@@ -1,7 +1,4 @@
 """
-HAPT Paper Trading Service
---------------------------
-
 Provides a simulated trading environment
 for strategy validation.
 """
@@ -36,7 +33,13 @@ class PaperTradingService:
     ) -> None:
         self._starting_cash = starting_cash
         self._cash = starting_cash
-        self._positions: dict[str, int] = {}
+
+        #
+        # Position size matches Order.quantity,
+        # which is defined as float.
+        #
+        self._positions: dict[str, float] = {}
+
         self._history: list[PaperTrade] = []
 
     @property
@@ -70,13 +73,13 @@ class PaperTradingService:
         if managed_order.order.side.name == "BUY":
             self._cash -= trade_value
             self._positions[symbol] = (
-                self._positions.get(symbol, 0)
+                self._positions.get(symbol, 0.0)
                 + quantity
             )
         else:
             self._cash += trade_value
             self._positions[symbol] = (
-                self._positions.get(symbol, 0)
+                self._positions.get(symbol, 0.0)
                 - quantity
             )
 
@@ -92,12 +95,12 @@ class PaperTradingService:
     def position(
         self,
         symbol: str,
-    ) -> int:
+    ) -> float:
         """
         Current position for a symbol.
         """
 
-        return self._positions.get(symbol, 0)
+        return self._positions.get(symbol, 0.0)
 
     def trade_history(
         self,

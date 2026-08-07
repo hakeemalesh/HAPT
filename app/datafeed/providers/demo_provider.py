@@ -1,7 +1,4 @@
 """
-HAPT Demo Market Data Provider
-------------------------------
-
 Provides simulated market prices for testing
 and development.
 """
@@ -14,8 +11,8 @@ class DemoProvider(BaseProvider):
     Demo market data provider.
     """
 
-    def __init__(self):
-        self._prices = {
+    def __init__(self) -> None:
+        self._prices: dict[str, float] = {
             "MES": 6250.25,
             "MNQ": 23250.50,
             "M2K": 2250.75,
@@ -31,11 +28,14 @@ class DemoProvider(BaseProvider):
     def get_provider_name(self) -> str:
         return "Demo Provider"
 
-    def get_price(self, symbol: str):
+    def get_price(
+        self,
+        symbol: str,
+    ) -> float | None:
         return self._prices.get(symbol)
 
     def symbol_exists(self, symbol: str) -> bool:
         return symbol in self._prices
 
-    def get_all_prices(self) -> dict:
+    def get_all_prices(self) -> dict[str, float]:
         return self._prices.copy()

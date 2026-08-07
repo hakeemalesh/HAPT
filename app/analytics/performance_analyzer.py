@@ -68,7 +68,7 @@ class PerformanceAnalyzer:
         Return rejection reasons ranked by frequency.
         """
 
-        reasons = Counter()
+        reasons: Counter[str] = Counter()
 
         for trade in self.journal.rejected_trades():
 

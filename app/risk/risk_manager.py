@@ -1,7 +1,4 @@
 """
-HAPT Risk Manager
------------------
-
 Evaluates whether a proposed trade satisfies
 HAPT risk management rules.
 
@@ -20,10 +17,13 @@ class RiskManager:
     MIN_RISK_REWARD = 2.0
     MIN_APPROVED_GRADE = ("A+", "A")
 
-    def __init__(self, account_manager=None):
+    def __init__(
+        self,
+        account_manager: AccountManager | None = None,
+    ) -> None:
         """Initialize the Risk Manager."""
 
-        self.account_manager = (
+        self.account_manager: AccountManager = (
             account_manager
             if account_manager is not None
             else AccountManager()

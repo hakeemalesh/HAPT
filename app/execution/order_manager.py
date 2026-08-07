@@ -30,10 +30,9 @@ class OrderManager:
     Central Order Management System.
     """
 
-    _next_order_id = count(1)
-
     def __init__(self) -> None:
         self._orders: dict[int, ManagedOrder] = {}
+        self._next_order_id = count(1)
 
     def submit(
         self,

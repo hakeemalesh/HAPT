@@ -1,7 +1,4 @@
 """
-HAPT Trade Model
-----------------
-
 Represents the complete lifecycle of a trade,
 from planning through execution and closure.
 """
@@ -41,6 +38,16 @@ class Trade:
     score: int = 0
 
     confidence: float = 0.0
+
+    # ----------------------------------
+    # AI Evaluation
+    # ----------------------------------
+
+    ai_decision: str = "PENDING"
+
+    ai_confidence: float = 0.0
+
+    ai_reason: str = ""
 
     # ----------------------------------
     # Planned Prices

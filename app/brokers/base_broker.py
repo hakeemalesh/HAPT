@@ -1,15 +1,18 @@
 """
 HAPT Base Broker
-----------------
 
-Defines the common interface for all broker implementations.
+Defines the common interface for all broker
+implementations.
 """
 
 from abc import ABC, abstractmethod
 
 
 class BaseBroker(ABC):
-    """Abstract base class for all broker implementations."""
+    """
+    Abstract base class for all broker
+    implementations.
+    """
 
     @abstractmethod
     def connect(self) -> None:
@@ -25,5 +28,13 @@ class BaseBroker(ABC):
         symbol: str,
         side: str,
         quantity: int,
-    ) -> None:
-        """Place an order through the broker."""
+    ) -> bool:
+        """
+        Place an order through the broker.
+
+        Returns
+        -------
+        bool
+            True if the order is accepted,
+            False otherwise.
+        """

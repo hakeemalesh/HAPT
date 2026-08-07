@@ -1,7 +1,4 @@
 """
-HAPT Trade Planner
-------------------
-
 Builds a complete executable trade plan from
 market context using the Strategy Engine.
 """
@@ -15,10 +12,10 @@ class TradePlanner:
     Builds a complete trade plan ready for execution.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize planner dependencies."""
 
-        self.strategy = StrategyEngine()
+        self.strategy: StrategyEngine = StrategyEngine()
 
     def create_trade_plan(
         self,
@@ -42,7 +39,9 @@ class TradePlanner:
             Completed trade plan.
         """
 
-        return self.strategy.analyze(
+        trade = self.strategy.analyze(
             context=market_context,
             entry_price=entry_price,
         )
+
+        return trade

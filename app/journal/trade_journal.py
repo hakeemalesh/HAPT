@@ -14,7 +14,7 @@ class TradeJournal:
     def __init__(self):
         """Initialize the trade journal."""
 
-        self._trades = []
+        self._trades: list[Trade] = []
 
     def add_trade(
         self,
